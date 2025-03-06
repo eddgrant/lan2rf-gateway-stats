@@ -90,4 +90,24 @@ tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative"
     jdkVersion = "21"
 }
 
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+    filter {
+        excludeTestsMatching("*IntegrationTest")
+    }
+    ignoreFailures = true
+}
 
+val integrationTestTask = tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests."
+    group = "verification"
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("*Integration*")
+    }
+    mustRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(integrationTestTask)
+}

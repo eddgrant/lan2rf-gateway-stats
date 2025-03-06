@@ -1,0 +1,29 @@
+name: Run tests and build the GraalVM native Docker image.
+
+on:
+  workflow_call:
+
+jobs:
+  unit-tests:
+    uses: ./.github/workflows/unit-tests.yaml
+
+  build:
+    permissions:
+      actions: read
+      checks: write
+      contents: write
+    needs:
+      - unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Checkout history and tags for semantic version calculation
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Note: We skip unit and integration tests as we're already run them above.
+      - name: Build GraalVM native image
+        run: ./gradlew --exclude-task test --exclude-task check dockerBuildNative

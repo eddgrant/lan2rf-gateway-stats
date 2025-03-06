@@ -1,0 +1,36 @@
+name: unit-tests
+
+on:
+  workflow_call:
+
+jobs:
+  run:
+    permissions:
+      actions: read # Is this needed?
+      checks: write # Needed by test-reporter to create a check which represents the test run.
+      contents: write # Is this needed?
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Run Unit Tests
+      run: ./gradlew test
+
+    - name: Upload test results artefacts
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: unit-test-results
+        path: build/test-results/test
+
+    - name: Publish Unit Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Unit Test Results
+        path: build/test-results/test/TEST-*.xml
+        reporter: java-junit

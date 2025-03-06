@@ -1,0 +1,14 @@
+name: Commit to main pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  main-build-and-release:
+    uses: ./.github/workflows/build-and-deploy.yaml
+    permissions:
+      actions: write
+      checks: write
+      contents: write
