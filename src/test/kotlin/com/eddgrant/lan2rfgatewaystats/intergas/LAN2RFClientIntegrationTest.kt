@@ -7,7 +7,7 @@ import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
 
 @MicronautTest(environments = ["integration-test"])
-class LAN2RFClientTest(
+class LAN2RFClientIntegrationTest(
     private val application: EmbeddedApplication<*>,
     private val objectMapper: ObjectMapper,
     private val client: LAN2RFClient
