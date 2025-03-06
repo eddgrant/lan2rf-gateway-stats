@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "groupName": "Micronaut Platform",
+      "groupSlug": "micronaut-platform",
+      "matchPackageNames": [
+        "io.micronaut.platform.*"
+      ]
+    }
+  ]
+}

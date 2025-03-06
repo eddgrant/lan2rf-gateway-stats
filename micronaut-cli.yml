@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.eddgrant.lan2rfgatewaystats
+testFramework: kotest
+sourceLanguage: kotlin
+buildTool: gradle_kotlin
+features: [ app-name, gradle, http-client, kotest, kotlin, kotlin-application, ksp, log4j2, micronaut-aot, micronaut-build, micronaut-http-validation, netty-server, properties, reactor-http-client, readme, serialization-jackson, shade, static-resources ]
