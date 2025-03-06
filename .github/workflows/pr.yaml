@@ -1,0 +1,12 @@
+name: Pull Request build and release
+
+on:
+  pull_request:
+
+jobs:
+  pr-build-and-release:
+    uses: ./.github/workflows/build-and-deploy.yaml
+    permissions:
+      actions: write
+      checks: write
+      contents: write
