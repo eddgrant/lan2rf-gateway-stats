@@ -10,6 +10,20 @@
       "matchPackageNames": [
         "io.micronaut.platform.*"
       ]
+    },
+    {
+      "groupName": "Micronaut",
+      "groupSlug": "micronaut",
+      "matchPackageNames": [
+        "io.micronaut.*"
+      ]
+    },
+    {
+      "groupName": "Jetbrains Kotlin",
+      "groupSlug": "jetbrains-platform",
+      "matchPackageNames": [
+        "org.jetbrains.kotlin.*"
+      ]
     }
   ]
 }
