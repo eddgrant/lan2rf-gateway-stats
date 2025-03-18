@@ -8,16 +8,14 @@ import com.eddgrant.lan2rfgatewaystats.persistence.influxdb.Temperature.Type.*
 import com.influxdb.client.kotlin.InfluxDBClientKotlin
 import com.influxdb.query.FluxRecord
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import reactor.core.publisher.Mono
 
-@OptIn(DelicateCoroutinesApi::class)
 @MicronautTest(environments = ["influxdb-integration-test"])
 class StatusDataEmitterTest(
     private val influxDBConfiguration: InfluxDBConfiguration,
@@ -83,7 +81,7 @@ class StatusDataEmitterTest(
         result.values["type"].shouldBe(type.name)
 
         // Assert there was exactly 1 matched result.
-        results.isClosedForReceive.shouldBeTrue()
+        results.receiveCatching().getOrNull().shouldBeNull()
     }
 
     suspend fun assertPressureInInfluxDB(
@@ -99,7 +97,7 @@ class StatusDataEmitterTest(
         result.values["subject"].shouldBe(subject)
 
         // Assert there was exactly 1 matched result.
-        results.isClosedForReceive.shouldBeTrue()
+        results.receiveCatching().getOrNull().shouldBeNull()
     }
 
     suspend fun assertStatusInInfluxDB(
@@ -112,7 +110,7 @@ class StatusDataEmitterTest(
         result.value.shouldBe(expectedStatus)
 
         // Assert there was exactly 1 matched result.
-        results.isClosedForReceive.shouldBeTrue()
+        results.receiveCatching().getOrNull().shouldBeNull()
     }
 
     afterSpec {
