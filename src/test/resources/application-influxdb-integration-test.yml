@@ -1,0 +1,33 @@
+micronaut:
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 10s
+      log-level: TRACE
+    services:
+      lan2rf:
+        urls:
+          - http://192.168.2.58
+  default:
+    allocator:
+      max-order: 3
+
+logger:
+  levels:
+    io:
+      micronaut:
+        http:
+          client: TRACE
+        #http:
+        #  client: INFO
+      retry: DEBUG
+    com:
+      eddgrant: INFO
+
+
+influxdb:
+  bucket: lan2rf
+  org: eddgrant.com
+  log-level: BODY
+  token: this-is-a-very-insecure-token
+  url: this-value-is-not-used-in-testing

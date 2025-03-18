@@ -44,6 +44,13 @@ dependencies {
     // Micronaut Serialisation
     ksp("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
+
+    implementation("com.influxdb:influxdb-client-kotlin:7.2.0")
+
+    testImplementation("org.testcontainers:influxdb:1.20.6")
+
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    implementation("io.micronaut.validation:micronaut-validation")
 }
 
 
