@@ -65,9 +65,16 @@ java {
     }
 }
 
+/**
+ * Important: Mocking of non-interface beans is currently broken and undocumented
+ * in Micronaut and requires this configuration in order to work.
+ * https://github.com/micronaut-projects/micronaut-core/issues/3972
+ */
+allOpen {
+    annotations("jakarta.inject.Singleton")
+}
 
 graalvmNative.toolchainDetection = true
-
 micronaut {
     version("$micronautVersion")
     runtime("netty")
