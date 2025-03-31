@@ -17,7 +17,7 @@ logger:
     io:
       micronaut:
         http:
-          client: TRACE
+          client: INFO
         #http:
         #  client: INFO
       retry: DEBUG
