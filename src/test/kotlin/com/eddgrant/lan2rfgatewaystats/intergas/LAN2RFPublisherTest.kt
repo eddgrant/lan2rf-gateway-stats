@@ -15,10 +15,10 @@ import kotlin.time.toJavaDuration
 
 
 @MicronautTest(environments = ["integration-test"])
-class StatusDataPublisherTest(
+class LAN2RFPublisherTest(
     private val intergasService: IntergasService,
     private val laN2RFConfiguration: LAN2RFConfiguration,
-    private val statusDataPublisher: StatusDataPublisher,
+    private val lan2rfPublisher: LAN2RFPublisher,
 ) : StringSpec({
 
     "it publishes status data as per the configured timings" {
@@ -46,7 +46,7 @@ class StatusDataPublisherTest(
         }
 
         // When
-        val statusDataList = statusDataPublisher
+        val statusDataList = lan2rfPublisher
             .publishStatusData()
             .takeUntil(takeUntilPredicate)
             .doOnNext({ logger.info("StatusData received.") })
@@ -68,6 +68,6 @@ class StatusDataPublisherTest(
     fun intergasService(): IntergasService = mockk<IntergasService>()
 
     companion object {
-        val logger = LoggerFactory.getLogger(StatusDataPublisherTest::class.java)
+        val logger = LoggerFactory.getLogger(LAN2RFPublisherTest::class.java)
     }
 }

@@ -17,11 +17,11 @@ import kotlinx.coroutines.runBlocking
 import reactor.core.publisher.Mono
 
 @MicronautTest(environments = ["influxdb-integration-test"])
-class StatusDataEmitterTest(
+class StatusDataPublisherIntegrationTest(
     private val influxDBConfiguration: InfluxDBConfiguration,
     private val influxDBService: InfluxDBService,
     private val influxDBClientKotlin: InfluxDBClientKotlin,
-    private val statusDataEmitter: StatusDataEmitter
+    private val statusDataPublisher: StatusDataPublisher
 ) : BehaviorSpec({
 
     fun findTemperatures(
@@ -123,7 +123,7 @@ class StatusDataEmitterTest(
             val statusData = Mono.just(BASIC)
             `when`("the status data is emitted") {
                 runBlocking {
-                    statusDataEmitter.emitStatusDataAsDiscreteMeasurements(statusData)
+                    statusDataPublisher.emitStatusDataAsDiscreteMeasurements(statusData)
                 }
                 val source = "lan2rf"
                 then("Room 1 temperature is sent to InfluxDB") {

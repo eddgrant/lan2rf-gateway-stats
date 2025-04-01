@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 
 @Singleton
-class StatusDataPublisher(
+class LAN2RFPublisher(
     private val intergasService: IntergasService,
     private val laN2RFConfiguration: LAN2RFConfiguration,
 ) {
@@ -17,6 +17,6 @@ class StatusDataPublisher(
     }
 
     companion object {
-        val LOGGER: Logger = LoggerFactory.getLogger(StatusDataPublisher::class.java)
+        val LOGGER: Logger = LoggerFactory.getLogger(LAN2RFPublisher::class.java)
     }
 }
