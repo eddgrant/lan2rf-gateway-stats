@@ -3,8 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version "2.1.20"
     id("com.google.devtools.ksp") version "2.1.20-1.0.32"
     id("com.gradleup.shadow") version "8.3.6"
-    id("io.micronaut.application") version "4.5.1"
-    id("io.micronaut.aot") version "4.5.1"
+    id("io.micronaut.application") version "4.5.2"
+    id("io.micronaut.aot") version "4.5.2"
 }
 
 version = "0.1"
