@@ -45,7 +45,7 @@ dependencies {
     ksp("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
 
-    implementation("com.influxdb:influxdb-client-kotlin:7.2.0")
+    implementation("com.influxdb:influxdb-client-kotlin:7.3.0")
 
     testImplementation("org.testcontainers:influxdb:1.21.0")
 
