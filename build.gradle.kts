@@ -47,7 +47,7 @@ dependencies {
 
     implementation("com.influxdb:influxdb-client-kotlin:7.2.0")
 
-    testImplementation("org.testcontainers:influxdb:1.21.0")
+    testImplementation("org.testcontainers:influxdb:1.21.1")
 
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
     implementation("io.micronaut.validation:micronaut-validation")
