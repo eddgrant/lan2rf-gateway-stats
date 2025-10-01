@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0 # Checkout history and tags for semantic version calculation
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       # Note: We skip unit and integration tests as we're already run them above.
       - name: Build GraalVM native image
