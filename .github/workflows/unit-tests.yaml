@@ -21,7 +21,7 @@ jobs:
       run: ./gradlew test
 
     - name: Upload test results artefacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: success() || failure()
       with:
         name: unit-test-results
