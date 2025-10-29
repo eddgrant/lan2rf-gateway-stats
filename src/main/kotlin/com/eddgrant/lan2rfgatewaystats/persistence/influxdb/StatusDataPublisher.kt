@@ -10,7 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import reactor.core.publisher.Mono
+import org.slf4j.LoggerFactory
+import reactor.core.Disposable
+import reactor.core.publisher.Flux
+import reactor.core.scheduler.Schedulers
 import java.time.Instant
 
 @Singleton
@@ -18,10 +21,13 @@ class StatusDataPublisher(
     private val influxDBClientKotlin: InfluxDBClientKotlin,
     private val lan2RFConfiguration: LAN2RFConfiguration
 ) {
-    fun emitStatusDataAsDiscreteMeasurements(statusData: Mono<StatusData>) {
-        statusData.subscribe {
-            rawEmitStatusDataAsDiscreteMeasurements(it)
-        }
+
+    fun emitStatusDataAsDiscreteMeasurements(statusData: Flux<StatusData>): Disposable {
+        return statusData
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe {
+                rawEmitStatusDataAsDiscreteMeasurements(it)
+            }
     }
 
     fun rawEmitStatusDataAsDiscreteMeasurements(statusData: StatusData) {
@@ -62,7 +68,11 @@ class StatusDataPublisher(
                     measurement,
                     WritePrecision.MS
                 )
-            println("Measurement written:  $measurement")
+            LOGGER.debug("Measurement written:  {}", measurement)
         }
+    }
+
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(StatusDataPublisher::class.java)
     }
 }
