@@ -17,12 +17,12 @@ logger:
     io:
       micronaut:
         http:
-          client: TRACE
+          client: WARN
         #http:
         #  client: INFO
-      retry: DEBUG
+      retry: WARN
     com:
-      eddgrant: INFO
+      eddgrant: DEBUG
 
 
 influxdb:
@@ -31,3 +31,6 @@ influxdb:
   log-level: BODY
   token: this-is-a-very-insecure-token
   url: this-value-is-not-used-in-testing
+
+lan2rf:
+  check-interval: 5s

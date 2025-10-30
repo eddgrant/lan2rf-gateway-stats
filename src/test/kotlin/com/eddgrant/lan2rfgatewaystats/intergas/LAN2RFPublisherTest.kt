@@ -18,7 +18,7 @@ import kotlin.time.toJavaDuration
 class LAN2RFPublisherTest(
     private val intergasService: IntergasService,
     private val laN2RFConfiguration: LAN2RFConfiguration,
-    private val lan2rfPublisher: LAN2RFPublisher,
+    private val lan2RfRepository: LAN2RFRepository,
 ) : StringSpec({
 
     "it publishes status data as per the configured timings" {
@@ -46,8 +46,8 @@ class LAN2RFPublisherTest(
         }
 
         // When
-        val statusDataList = lan2rfPublisher
-            .publishStatusData()
+        val statusDataList = lan2RfRepository
+            .getStatusData()
             .takeUntil(takeUntilPredicate)
             .doOnNext({ logger.info("StatusData received.") })
             .doOnComplete({ logger.info("Take until predicate time limit reached.") })

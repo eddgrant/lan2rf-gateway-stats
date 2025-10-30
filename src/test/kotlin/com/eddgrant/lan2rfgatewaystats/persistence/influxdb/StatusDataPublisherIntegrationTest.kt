@@ -14,7 +14,6 @@ import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import reactor.core.publisher.Flux
-import reactor.core.scheduler.Schedulers
 
 @MicronautTest(environments = ["influxdb-integration-test"])
 class StatusDataPublisherIntegrationTest(
@@ -122,13 +121,9 @@ class StatusDataPublisherIntegrationTest(
         given("a status data exists") {
             val statusData = Flux.just(BASIC)
             `when`("the status data is emitted") {
-                statusData
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .doOnNext {
-                        statusDataPublisher.rawEmitStatusDataAsDiscreteMeasurements(it)
-                    }
+                statusDataPublisher.emitStatusDataAsDiscreteMeasurements(statusData)
                     .blockLast()
-                val source = "lan2rf"
+
                 then("Room 1 temperature is sent to InfluxDB") {
                     assertTemperatureInInfluxDB(LAN2RF_DEFAULT_SOURCE_NAME, "room1", BASIC.room1Temperature(), RECORDED)
                 }

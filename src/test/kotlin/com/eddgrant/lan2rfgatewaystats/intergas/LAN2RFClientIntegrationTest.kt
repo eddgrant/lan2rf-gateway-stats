@@ -4,9 +4,10 @@ import io.kotest.core.spec.style.StringSpec
 import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.serde.ObjectMapper
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 
-@MicronautTest(environments = ["integration-test"])
+@MicronautTest(environments = ["influxdb-integration-test"])
 class LAN2RFClientIntegrationTest(
     private val application: EmbeddedApplication<*>,
     private val objectMapper: ObjectMapper,

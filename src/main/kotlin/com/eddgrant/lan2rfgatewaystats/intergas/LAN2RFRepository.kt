@@ -6,17 +6,18 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 
 @Singleton
-class LAN2RFPublisher(
+class LAN2RFRepository(
     private val intergasService: IntergasService,
     private val laN2RFConfiguration: LAN2RFConfiguration,
 ) {
 
-    fun publishStatusData() : Flux<StatusData> {
+    fun getStatusData() : Flux<StatusData> {
         return Flux.interval(laN2RFConfiguration.checkInterval)
             .flatMap { intergasService.getStatusData() }
+            .doOnNext({LOGGER.info("LAN2RF status data published")})
     }
 
     companion object {
-        val LOGGER: Logger = LoggerFactory.getLogger(LAN2RFPublisher::class.java)
+        val LOGGER: Logger = LoggerFactory.getLogger(LAN2RFRepository::class.java)
     }
 }
