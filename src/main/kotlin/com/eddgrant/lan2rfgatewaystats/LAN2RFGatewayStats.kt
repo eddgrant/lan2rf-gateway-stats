@@ -21,11 +21,12 @@ class LAN2RFGatewayStats(
             LOGGER.debug("Continuing subscription to LAN2RF data.")
             sleep(1000)
         }
+        LOGGER.info("Subscription to LAN2RF data cancelled")
     }
 
     @PreDestroy
     fun onShutdown() {
-        LOGGER.info("Shutdown signal received: exiting loop.")
+        LOGGER.info("Shutdown signal received")
         shutdownRequested.set(true)
     }
 

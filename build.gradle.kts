@@ -123,6 +123,16 @@ val integrationTestTask = tasks.register<Test>("integrationTest") {
     mustRunAfter(tasks.test)
 }
 
+val endToEndTestTask = tasks.register<Test>("endToEndTest") {
+    description = "Runs End to End tests. For manual invocation only, not included in the check task"
+    group = "verification"
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("*EndToEnd*")
+    }
+    mustRunAfter(tasks.test)
+}
+
 tasks.check {
     dependsOn(integrationTestTask)
 }
