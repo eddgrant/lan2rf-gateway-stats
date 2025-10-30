@@ -52,10 +52,6 @@ dependencies {
 
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
     implementation("io.micronaut.validation:micronaut-validation")
-
-    val testContainersVersion = "1.20.6"
-    implementation("org.testcontainers:influxdb:$testContainersVersion")
-    implementation("io.projectreactor:reactor-test")
 }
 
 
@@ -109,56 +105,35 @@ tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative"
     jdkVersion = "21"
 }
 
-testing {
-    suites {
-        // The default 'test' suite for unit tests.
-        // Runs tests in 'src/test'.
-        val test by getting(JvmTestSuite::class) {
-            targets {
-                all {
-                    testTask.configure {
-                        useJUnitPlatform()
-                        // To match original configuration
-                        ignoreFailures = true
-                    }
-                }
-            }
-        }
-
-        // Suite for integration tests.
-        // Runs tests in 'src/integrationTest'.
-        // This suite is run as part of the 'check' task.
-        val integrationTest by registering(JvmTestSuite::class) {
-            dependencies {
-                implementation(project())
-            }
-
-            targets {
-                all {
-                    testTask.configure {
-                        useJUnitPlatform()
-                        mustRunAfter(tasks.getByName("test"))
-                    }
-                }
-            }
-        }
-
-        // Suite for end-to-end tests.
-        // Runs tests in 'src/endToEndTest'.
-        // This suite is NOT part of the 'check' task and must be run manually.
-        val endToEndTest by registering(JvmTestSuite::class) {
-            dependencies {
-                implementation(project())
-            }
-
-            targets {
-                all {
-                    testTask.configure {
-                        useJUnitPlatform()
-                        mustRunAfter(tasks.getByName("test"))
-                    }
-                }
-            }
-        }
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+    filter {
+        excludeTestsMatching("*IntegrationTest")
+        excludeTestsMatching("*EndToEnd*")
     }
+    ignoreFailures = true
+}
+
+val integrationTestTask = tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests."
+    group = "verification"
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("*Integration*")
+    }
+    mustRunAfter(tasks.test)
+}
+
+val endToEndTestTask = tasks.register<Test>("endToEndTest") {
+    description = "Runs End to End tests. For manual invocation only, not included in the check task"
+    group = "verification"
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("*EndToEnd*")
+    }
+    mustRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(integrationTestTask)
 }
