@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Instant
+import java.time.Instant.now
 
 @Singleton
 class StatusDataPublisher(
@@ -26,7 +27,15 @@ class StatusDataPublisher(
                 Mono.create<Void> { sink ->
                     val job = CoroutineScope(Dispatchers.IO).launch {
                         try {
-                            rawEmitStatusDataAsDiscreteMeasurements(statusDataValue)
+                            val now = now()
+                            val measurements = asMeasurements(statusDataValue, now)
+                            influxDBClientKotlin
+                                .getWriteKotlinApi()
+                                .writeMeasurements(
+                                    measurements,
+                                    WritePrecision.MS
+                                )
+                            LOGGER.debug("Measurements written for timestamp: {}", now)
                             sink.success()
                         } catch (e: Exception) {
                             sink.error(e)
@@ -37,31 +46,76 @@ class StatusDataPublisher(
             }
     }
 
-    private suspend fun rawEmitStatusDataAsDiscreteMeasurements(statusData: StatusData) {
-        val now = Instant.now()
-
-        val measurements = listOf(
-            Temperature(lan2RFConfiguration.source, "central_heating", statusData.centralHeatingTemperature(), RECORDED, now),
-            Temperature(lan2RFConfiguration.source, "room1", statusData.room1Temperature(), RECORDED, now),
-            Temperature(lan2RFConfiguration.source, "room2", statusData.room2Temperature(), RECORDED, now),
-            Temperature(lan2RFConfiguration.source, "tap", statusData.tapTemperature(), RECORDED, now),
-            Temperature(lan2RFConfiguration.source, "room1", statusData.room1TemperatureSetpoint(), SETPOINT, now),
-            Temperature(lan2RFConfiguration.source, "room1", statusData.room1TemperatureSetpointOverride(), SETPOINT_OVERRIDE, now),
-            Temperature(lan2RFConfiguration.source, "room2", statusData.room2TemperatureSetpoint(), SETPOINT, now),
-            Temperature(lan2RFConfiguration.source, "room2", statusData.room2TemperatureSetpointOverride(), SETPOINT_OVERRIDE, now),
-            Pressure(lan2RFConfiguration.source, "central_heating", statusData.centralHeatingPressure(), now),
-            Status(lan2RFConfiguration.source, statusData.getStatusDisplayCode(), now)
+    private fun asMeasurements(
+        statusDataValue: StatusData,
+        now: Instant
+    ): Set<Any> {
+        val measurements = setOf(
+            Temperature(
+                lan2RFConfiguration.source,
+                "central_heating",
+                statusDataValue.centralHeatingTemperature(),
+                RECORDED,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "room1",
+                statusDataValue.room1Temperature(),
+                RECORDED,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "room2",
+                statusDataValue.room2Temperature(),
+                RECORDED,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "tap",
+                statusDataValue.tapTemperature(),
+                RECORDED,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "room1",
+                statusDataValue.room1TemperatureSetpoint(),
+                SETPOINT,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "room1",
+                statusDataValue.room1TemperatureSetpointOverride(),
+                SETPOINT_OVERRIDE,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "room2",
+                statusDataValue.room2TemperatureSetpoint(),
+                SETPOINT,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                "room2",
+                statusDataValue.room2TemperatureSetpointOverride(),
+                SETPOINT_OVERRIDE,
+                now
+            ),
+            Pressure(
+                lan2RFConfiguration.source,
+                "central_heating",
+                statusDataValue.centralHeatingPressure(),
+                now
+            ),
+            Status(lan2RFConfiguration.source, statusDataValue.getStatusDisplayCode(), now)
         )
-
-        // isLockedOut
-
-        influxDBClientKotlin
-            .getWriteKotlinApi()
-            .writeMeasurements(
-                measurements,
-                WritePrecision.MS
-            )
-        LOGGER.debug("Measurements written for timestamp: {}", now)
+        return measurements
     }
 
     companion object {
