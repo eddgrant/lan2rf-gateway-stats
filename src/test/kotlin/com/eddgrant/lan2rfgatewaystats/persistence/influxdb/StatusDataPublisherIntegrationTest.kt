@@ -121,7 +121,7 @@ class StatusDataPublisherIntegrationTest(
         given("a status data exists") {
             val statusData = Flux.just(BASIC)
             `when`("the status data is emitted") {
-                statusDataPublisher.publishStatusDataAsDiscreteMeasurements(statusData)
+                statusDataPublisher.publishAsDiscreteMeasurements(statusData)
                     .blockLast()
 
                 then("Room 1 temperature is sent to InfluxDB") {

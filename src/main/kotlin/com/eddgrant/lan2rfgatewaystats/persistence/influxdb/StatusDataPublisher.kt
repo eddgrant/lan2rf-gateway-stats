@@ -21,7 +21,7 @@ class StatusDataPublisher(
     private val lan2RFConfiguration: LAN2RFConfiguration
 ) {
 
-    fun publishStatusDataAsDiscreteMeasurements(statusData: Flux<StatusData>): Flux<Void> {
+    fun publishAsDiscreteMeasurements(statusData: Flux<StatusData>): Flux<Void> {
         return statusData
             .flatMap { statusDataValue ->
                 Mono.create<Void> { sink ->
