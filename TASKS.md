@@ -5,8 +5,14 @@
 3. ~~StatusDataPublisher: Make it possible to configure the publish interval via @ConfigurationProperties~~
 4. ~~StatusDataPublisher: Update unit tests to use @ConfigurationProperties~~
 5. ~~StatusDataPublisherTest: Mock StatusDataPublisherTest so we're not reliant on being on-network to run the tests.~~
-6. influxdb.StatusDataEmitter: Update to consume the Flux<StatusData> returned by the StatusDataPublisher
-7. influxdb.StatusDataEmitter: Rename?
+6. ~~influxdb.StatusDataEmitter: Update to consume the Flux<StatusData> returned by the StatusDataPublisher~~
+7. ~~influxdb.StatusDataEmitter: Rename?~~
+8. ~~Fix failing tests~~
+9. Identify areas where tests are missing and write them
+10. Fix Gradle warnings
+9. Build the app as a native image and test that it works
+  * Can this be tested conveniently as a Gradle task? What did I do for influxdb-weather-ingestor?
+10. Support consumption of data from LAN2RF devices which have basic auth enabled
 
 # Decisions
 

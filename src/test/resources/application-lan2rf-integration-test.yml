@@ -1,0 +1,9 @@
+micronaut:
+  http:
+    services:
+      lan2rf:
+        urls:
+          - http://192.168.2.58
+
+lan2rf:
+  check-interval: 5s

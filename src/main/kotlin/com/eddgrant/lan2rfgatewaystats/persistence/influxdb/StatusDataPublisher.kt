@@ -5,6 +5,7 @@ import com.eddgrant.lan2rfgatewaystats.intergas.StatusData
 import com.eddgrant.lan2rfgatewaystats.persistence.influxdb.Temperature.Type.*
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.kotlin.InfluxDBClientKotlin
+import io.micronaut.context.annotation.Requires
 import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import java.time.Instant
 import java.time.Instant.now
 
 @Singleton
+@Requires(beans = [InfluxDBClientKotlin::class, LAN2RFConfiguration::class])
 class StatusDataPublisher(
     private val influxDBClientKotlin: InfluxDBClientKotlin,
     private val lan2RFConfiguration: LAN2RFConfiguration

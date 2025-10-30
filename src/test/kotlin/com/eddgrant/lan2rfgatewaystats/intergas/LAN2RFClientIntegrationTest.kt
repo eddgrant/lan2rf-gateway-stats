@@ -7,7 +7,7 @@ import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 
-@MicronautTest(environments = ["influxdb-integration-test"])
+@MicronautTest(environments = ["lan2rf-integration-test"])
 class LAN2RFClientIntegrationTest(
     private val application: EmbeddedApplication<*>,
     private val objectMapper: ObjectMapper,

@@ -2,11 +2,16 @@ package com.eddgrant.lan2rfgatewaystats.persistence.influxdb
 
 import com.influxdb.LogLevel
 import io.micronaut.context.annotation.ConfigurationProperties
+import io.micronaut.context.annotation.Requires
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import java.net.URL
 
 @ConfigurationProperties("influxdb")
+@Requires(property = "influxdb.bucket")
+@Requires(property = "influxdb.org")
+@Requires(property = "influxdb.token")
+@Requires(property = "influxdb.url")
 class InfluxDBConfiguration {
 
     @NotBlank

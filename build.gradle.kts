@@ -109,6 +109,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
     filter {
         excludeTestsMatching("*IntegrationTest")
+        excludeTestsMatching("*EndToEnd*")
     }
     ignoreFailures = true
 }

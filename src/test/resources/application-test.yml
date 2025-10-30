@@ -1,0 +1,24 @@
+micronaut:
+  http:
+    client:
+      log-level: TRACE
+
+logger:
+  levels:
+    io:
+      micronaut:
+        http:
+          client: WARN
+        #http:
+        #  client: INFO
+      retry: WARN
+    com:
+      eddgrant: DEBUG
+
+
+influxdb:
+  bucket: lan2rf
+  org: eddgrant.com
+  log-level: BODY
+  token: this-is-a-very-insecure-token
+  url: this-value-is-not-used-in-testing

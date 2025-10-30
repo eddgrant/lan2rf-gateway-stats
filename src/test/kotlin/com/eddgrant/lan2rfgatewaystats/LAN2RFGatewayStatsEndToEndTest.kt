@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory
  * so this test is not suitable for automated CI/CD pipelines.
  */
 @MicronautTest(
-    environments = ["influxdb-integration-test"]
+    environments = ["influxdb-integration-test", "lan2rf-integration-test"]
 )
 class LAN2RFGatewayStatsEndToEndTest(
     private val lan2RFGatewayStats: LAN2RFGatewayStats,

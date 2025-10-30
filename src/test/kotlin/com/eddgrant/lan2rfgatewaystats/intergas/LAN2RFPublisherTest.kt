@@ -14,7 +14,7 @@ import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
 
-@MicronautTest(environments = ["integration-test"])
+@MicronautTest
 class LAN2RFPublisherTest(
     private val intergasService: IntergasService,
     private val laN2RFConfiguration: LAN2RFConfiguration,

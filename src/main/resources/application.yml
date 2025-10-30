@@ -2,3 +2,20 @@
 micronaut:
   application:
     name: lan2rf-gateway-stats
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 10s
+      log-level: WARN
+  default:
+    allocator:
+      max-order: 3
+
+logger:
+  levels:
+    io: WARN
+    com: WARN
+    com.eddgrant: INFO
+
+lan2rf:
+  check-interval: 60s

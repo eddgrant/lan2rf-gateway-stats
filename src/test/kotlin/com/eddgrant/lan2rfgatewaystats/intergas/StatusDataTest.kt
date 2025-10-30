@@ -5,62 +5,10 @@ import io.micronaut.serde.ObjectMapper
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
 
-/**
- * {
- *     "nodenr": 200,
- *     [DONE] "ch_temp_lsb": 59,
- *     [DONE] "ch_temp_msb": 10,
- *     [DONE] "tap_temp_lsb": 216,
- *     [DONE] "tap_temp_msb": 10,
- *     [DONE] "ch_pressure_lsb": 156,
- *     [DONE] "ch_pressure_msb": 0,
- *     [DONE] "room_temp_1_lsb": 208,
- *     [DONE] "room_temp_1_msb": 7,
- *     [DONE] "room_temp_set_1_lsb": 208,
- *     [DONE] "room_temp_set_1_msb": 7,
- *     [DONE] "room_temp_2_lsb": 255,
- *     [DONE] "room_temp_2_msb": 127,
- *     [DONE] "room_temp_set_2_lsb": 255,
- *     [DONE] "room_temp_set_2_msb": 127,
- *     [DONE] "displ_code": 231,
- *     "IO": 2,
- *     "serial_year": 18,
- *     "serial_month": 4,
- *     "serial_line": 15,
- *     "serial_sn1": 0,
- *     "serial_sn2": 70,
- *     "serial_sn3": 63,
- *     [DONE] "room_set_ovr_1_msb": 0,
- *     [DONE] "room_set_ovr_1_lsb": 0,
- *     [DONE] "room_set_ovr_2_msb": 0,
- *     [DONE] "room_set_ovr_2_lsb": 0,
- *     "rf_message_rssi": 37,
- *     "rfstatus_cntr": 0
- * }
- */
-
-/**
- * Value = 5
- * 5 as binary = 0000 0000 00000101
- * MSB: 0000 0000
- * LSB: 00000101
- *
- * 2700
- * MSB: 00001010 (10)
- * LSB: 10001100 (140)
- *
- * MSB >> 8: 0000101000000000 (2560)
- * 2700 - 2560 =
- *
- * MSB | LSB = 0000101010001100
- */
-
-
-@OptIn(ExperimentalUnsignedTypes::class)
 @MicronautTest
 class StatusDataTest(
     private val objectMapper: ObjectMapper,
-    ) : StringSpec({
+) : StringSpec({
 
     val statusData = StatusDataTestFixtures.BASIC
 

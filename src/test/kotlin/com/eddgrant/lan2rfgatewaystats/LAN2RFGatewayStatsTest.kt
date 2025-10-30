@@ -7,7 +7,7 @@ import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import io.mockk.mockk
 
-@MicronautTest(environments = ["influxdb-integration-test"])
+@MicronautTest(environments = ["lan2rf-integration-test"])
 class LAN2RFGatewayStatsTest(
     private val lan2RFClient : LAN2RFClient,
     private val statusDataOrchestrator: StatusDataOrchestrator,
