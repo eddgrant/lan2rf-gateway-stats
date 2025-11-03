@@ -1,17 +1,22 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import io.micronaut.gradle.docker.MicronautDockerfile
+
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.2.21"
     id("org.jetbrains.kotlin.plugin.allopen") version "2.2.21"
-    id("com.google.devtools.ksp") version "2.2.20-2.0.4"
+    id("com.google.devtools.ksp") version "2.3.0"
     id("com.gradleup.shadow") version "9.2.2"
     id("io.micronaut.application") version "4.6.1"
     id("io.micronaut.aot") version "4.6.1"
+    id("com.bmuschko.docker-remote-api") version "9.4.0" // apply false
 }
 
-version = "0.1"
 group = "com.eddgrant.lan2rfgatewaystats"
 
 val micronautVersion by properties
 val kotlinVersion by properties
+val dockerRegistryHost by properties
 
 repositories {
     mavenCentral()
@@ -100,11 +105,6 @@ micronaut {
     }
 }
 
-
-tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
-    jdkVersion = "21"
-}
-
 tasks.named<Test>("test") {
     useJUnitPlatform()
     filter {
@@ -112,6 +112,10 @@ tasks.named<Test>("test") {
         excludeTestsMatching("*EndToEnd*")
     }
     ignoreFailures = true
+}
+
+tasks.named<MicronautDockerfile>("dockerfile") {
+    baseImage.set("eclipse-temurin:${org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21.target}-jre")
 }
 
 val integrationTestTask = tasks.register<Test>("integrationTest") {
@@ -136,4 +140,27 @@ val endToEndTestTask = tasks.register<Test>("endToEndTest") {
 
 tasks.check {
     dependsOn(integrationTestTask)
+}
+
+
+tasks.named<DockerBuildImage>("dockerBuild") {
+    imageId.set("eddgrant/${project.name}")
+    images.add("${dockerRegistryHost}/eddgrant/${project.name}:${project.version}")
+    images.add("${dockerRegistryHost}/eddgrant/${project.name}:latest")
+    images.add("${dockerRegistryHost}/eddgrant/${project.name}:local")
+    mustRunAfter(tasks.withType(Test::class.java))
+}
+
+tasks.register<DockerPushImage>("dockerPushVersion") {
+    dependsOn("dockerBuild")
+    images.set(listOf(
+        "${dockerRegistryHost}/eddgrant/${project.name}:${project.version}",
+    ))
+}
+
+tasks.register<DockerPushImage>("dockerPushLatest") {
+    dependsOn("dockerBuild")
+    images.set(listOf(
+        "${dockerRegistryHost}/eddgrant/${project.name}:latest",
+    ))
 }
