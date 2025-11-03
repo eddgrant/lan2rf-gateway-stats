@@ -1,7 +1,9 @@
 package com.eddgrant.lan2rfgatewaystats
 
 import com.eddgrant.lan2rfgatewaystats.persistence.influxdb.StatusDataOrchestrator
+import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.Micronaut.run
+import io.micronaut.runtime.server.event.ServerStartupEvent
 import jakarta.annotation.PreDestroy
 import jakarta.inject.Singleton
 import org.slf4j.Logger
@@ -12,10 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Singleton
 class LAN2RFGatewayStats(
     private val statusDataOrchestrator: StatusDataOrchestrator
-) {
+) : ApplicationEventListener<ServerStartupEvent> {
     private val shutdownRequested = AtomicBoolean(false)
 
-    fun run() {
+    override fun onApplicationEvent(event: ServerStartupEvent?) {
+        LOGGER.info("Running...")
         statusDataOrchestrator.emitStatusData()
         while(!statusDataOrchestrator.disposable.isDisposed && !shutdownRequested.get()) {
             LOGGER.debug("Continuing subscription to LAN2RF data.")
@@ -39,4 +42,3 @@ class LAN2RFGatewayStats(
 fun main(args: Array<String>) {
     run(LAN2RFGatewayStats::class.java, *args)
 }
-

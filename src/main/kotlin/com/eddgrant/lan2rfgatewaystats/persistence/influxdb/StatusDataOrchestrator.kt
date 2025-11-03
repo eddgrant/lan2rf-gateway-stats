@@ -17,6 +17,7 @@ class StatusDataOrchestrator(
     lateinit var disposable: Disposable
 
     fun emitStatusData() {
+        LOGGER.info("Starting subscription to LAN2RF data.")
         disposable = statusDataPublisher.publishAsDiscreteMeasurements(
             laN2RFRepository.getStatusData()
         ).subscribe()

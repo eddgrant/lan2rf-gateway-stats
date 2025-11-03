@@ -5,7 +5,9 @@ import com.eddgrant.lan2rfgatewaystats.persistence.influxdb.InfluxDBConfiguratio
 import com.influxdb.client.kotlin.InfluxDBClientKotlin
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.micronaut.runtime.server.event.ServerStartupEvent
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
+import io.mockk.mockk
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
 import org.slf4j.Logger
@@ -31,7 +33,7 @@ class LAN2RFGatewayStatsEndToEndTest(
 
     beforeSpec {
         CoroutineScope(Dispatchers.IO).launch {
-            lan2RFGatewayStats.run()
+            lan2RFGatewayStats.onApplicationEvent(mockk<ServerStartupEvent>())
         }
     }
 

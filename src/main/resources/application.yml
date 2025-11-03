@@ -7,9 +7,14 @@ micronaut:
       connect-timeout: 5s
       read-timeout: 10s
       log-level: WARN
+    services:
+      lan2rf:
+        urls:
+          - "${LAN2RF_URL}"
   default:
     allocator:
       max-order: 3
+
 
 logger:
   levels:
