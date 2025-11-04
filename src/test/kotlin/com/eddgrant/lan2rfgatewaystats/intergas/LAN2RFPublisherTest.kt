@@ -9,46 +9,28 @@ import io.mockk.every
 import io.mockk.mockk
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
-import java.util.concurrent.CountDownLatch
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
 
-@MicronautTest
+@MicronautTest(environments = ["lan2rf-integration-test"])
 class LAN2RFPublisherTest(
     private val intergasService: IntergasService,
-    private val laN2RFConfiguration: LAN2RFConfiguration,
     private val lan2RfRepository: LAN2RFRepository,
 ) : StringSpec({
 
     "it publishes status data as per the configured timings" {
         // Given
         val publishDuration = Duration.parse("50ms")
-        val laN2RFConfigurationMock = getMock(laN2RFConfiguration)
-        every { laN2RFConfigurationMock.checkInterval } returns publishDuration.toJavaDuration()
-
         val intergasServiceMock = getMock(intergasService)
         every { intergasServiceMock.getStatusData() } returns Mono.just(StatusDataTestFixtures.BASIC)
 
         val numberOfEmissionsToWaitFor = 5
-        val countdownLatch = CountDownLatch(numberOfEmissionsToWaitFor)
-        val takeUntilPredicate = { _: StatusData ->
-            countdownLatch.countDown()
-            logger.info("Latch decremented by 1.")
-            val numberOfRemainingValuesToConsume = countdownLatch.count
-            if(numberOfRemainingValuesToConsume == 0L) {
-                logger.info("Signalling consumer to take no more data.")
-                true
-            }
-            else {
-                false
-            }
-        }
 
         // When
         val statusDataList = lan2RfRepository
             .getStatusData()
-            .takeUntil(takeUntilPredicate)
+            .take(numberOfEmissionsToWaitFor.toLong())
             .doOnNext({ logger.info("StatusData received.") })
             .doOnComplete({ logger.info("Take until predicate time limit reached.") })
             .collectList()
@@ -57,12 +39,16 @@ class LAN2RFPublisherTest(
 
         // Then
         statusDataList.size.shouldBe(numberOfEmissionsToWaitFor)
-        statusDataList.forEach({ it.shouldBe(StatusDataTestFixtures.BASIC)})
+        statusDataList.forEach({ it.shouldBe(StatusDataTestFixtures.BASIC) })
     }
 
 }){
     @MockBean(LAN2RFConfiguration::class)
-    fun lan2rfConfiguration(): LAN2RFConfiguration = mockk<LAN2RFConfiguration>()
+    fun lan2rfConfiguration(): LAN2RFConfiguration {
+        val mock = mockk<LAN2RFConfiguration>()
+        every { mock.checkInterval } returns Duration.parse("50ms").toJavaDuration()
+        return mock
+    }
 
     @MockBean(IntergasService::class)
     fun intergasService(): IntergasService = mockk<IntergasService>()

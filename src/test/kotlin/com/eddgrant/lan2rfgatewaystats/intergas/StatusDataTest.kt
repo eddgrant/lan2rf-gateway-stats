@@ -5,7 +5,7 @@ import io.micronaut.serde.ObjectMapper
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
 
-@MicronautTest
+@MicronautTest(environments = ["lan2rf-integration-test"])
 class StatusDataTest(
     private val objectMapper: ObjectMapper,
 ) : StringSpec({

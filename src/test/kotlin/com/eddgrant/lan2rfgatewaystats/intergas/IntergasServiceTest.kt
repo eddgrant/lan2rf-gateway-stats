@@ -15,7 +15,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import reactor.core.publisher.Mono
 
-@MicronautTest
+@MicronautTest(environments = ["lan2rf-integration-test"])
 class IntergasServiceTest(
     private val objectMapper: ObjectMapper,
     private val lan2RFClient : LAN2RFClient,

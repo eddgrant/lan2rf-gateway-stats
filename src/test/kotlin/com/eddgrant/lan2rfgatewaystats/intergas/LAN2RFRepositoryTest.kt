@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.time.Duration
 
-@MicronautTest
+@MicronautTest(environments = ["lan2rf-integration-test"])
 class LAN2RFRepositoryTest(
     private val intergasService: IntergasService,
     private val lan2rfConfiguration: LAN2RFConfiguration,
