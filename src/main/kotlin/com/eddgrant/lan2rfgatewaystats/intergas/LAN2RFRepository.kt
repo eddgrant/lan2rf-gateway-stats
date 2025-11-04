@@ -14,7 +14,7 @@ class LAN2RFRepository(
     fun getStatusData() : Flux<StatusData> {
         return Flux.interval(laN2RFConfiguration.checkInterval)
             .flatMap { intergasService.getStatusData() }
-            .doOnNext({LOGGER.info("LAN2RF status data obtained")})
+            .doOnNext({LOGGER.debug("LAN2RF status data obtained")})
     }
 
     companion object {

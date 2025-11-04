@@ -12,9 +12,9 @@
 10. Fix Gradle warnings
     * Do not upgrade to jvm-test-suite plugin yet. It's in incubating and doesn't work very well!
       * IntelliJ was unable to resolve classpath dependencies
-9. Build the app as a native image and test that it works
+11. Build the app as a Docker image and test that it works
   * Can this be tested conveniently as a Gradle task? What did I do for influxdb-weather-ingestor?
-10. Support consumption of data from LAN2RF devices which have basic auth enabled
+12. Support consumption of data from LAN2RF devices which have basic auth enabled
 
 # Decisions
 

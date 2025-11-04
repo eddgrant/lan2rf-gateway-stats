@@ -1,6 +1,7 @@
-package com.eddgrant.lan2rfgatewaystats.persistence.influxdb
+package com.eddgrant.lan2rfgatewaystats
 
 import com.eddgrant.lan2rfgatewaystats.intergas.LAN2RFRepository
+import com.eddgrant.lan2rfgatewaystats.persistence.influxdb.StatusDataPublisher
 import io.micronaut.context.annotation.Context
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
@@ -11,7 +12,7 @@ import reactor.core.Disposable
 
 @Singleton
 @Context
-class StatusDataOrchestrator(
+class LAN2RFGatewayStatsApp(
     private val laN2RFRepository: LAN2RFRepository,
     private val statusDataPublisher: StatusDataPublisher
 ) {
@@ -27,7 +28,7 @@ class StatusDataOrchestrator(
     }
 
     @PreDestroy
-    fun stopSendingStatusData() {
+    fun stop() {
         LOGGER.info("Shutdown signal received: Cancelling subscription to LAN2RF data.")
         if (this::disposable.isInitialized && !disposable.isDisposed) {
             disposable.dispose()
@@ -35,6 +36,6 @@ class StatusDataOrchestrator(
     }
 
     companion object {
-        val LOGGER: Logger = LoggerFactory.getLogger(StatusDataOrchestrator::class.java)
+        val LOGGER: Logger = LoggerFactory.getLogger(LAN2RFGatewayStatsApp::class.java)
     }
 }

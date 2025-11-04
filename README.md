@@ -47,9 +47,7 @@ docker run --rm \
 
 Ensure that the InfluxDB variables match the ones used when setting up InfluxDB.
 
-Ensure that you set a valid UK postcode for the `CHECKS_POSTCODE` environment variable.
-
-Ensure that you set your Meteomatics username and password for the `METEOMATICS_USERNAME` and `METEOMATICS_PASSWORD` environment variables.
+Ensure that you set a valid hostname / IP address for the `LAN2RF_URL` environment variable.
 
 ## Check the logs
 
@@ -61,26 +59,35 @@ lan2rf-gateway-stats should start and begin to log its output to the console:
 | |\/| | |/ __| '__/ _ \| '_ \ / _` | | | | __|
 | |  | | | (__| | | (_) | | | | (_| | |_| | |_ 
 |_|  |_|_|\___|_|  \___/|_| |_|\__,_|\__,_|\__|
-18:09:08.145 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'io.http.client'
-18:09:08.147 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'DEBUG' for logger: 'io.retry'
-18:09:08.147 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'com.eddgrant'
-18:09:08.147 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'io.micronaut'
-18:09:08.556 [main] INFO  c.e.i.checks.RegisterChecksAction - Temperature checks scheduled to run on schedule: * * * * *
-18:09:08.560 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 606ms. Server Running: http://4294397d97fa:8080
+18:54:27.578 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'com'
+18:54:27.579 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'com.eddgrant'
+18:54:27.580 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'io'
+18:54:27.463 [main] INFO  c.e.l.LAN2RFGatewayStatsApp - Starting subscription to LAN2RF data.
+18:54:27.567 [main] INFO  c.e.l.LAN2RFGatewayStatsApp - Subscription to LAN2RF data created.
 ```
 
-By default lan2rf-gateway-stats will check the temperature every minute.
+By default lan2rf-gateway-stats will check the status data every minute.
 
-This can be altered by setting the `CHECKS_SCHEDULE_EXPRESSION` environment variable e.g.
+This can be altered by setting the `LAN2RF_CHECK_INTERVAL` environment variable e.g.
 
 ```shell
-CHECKS_SCHEDULE_EXPRESSION=*/10 * * * *`
+CHECKS_SCHEDULE_EXPRESSION=30s`
 ````
 
-Each time a temperature measurement is sent to InfluxDB an `INFO` level log entry is written e.g.
+`LAN2RF_CHECK_INTERVAL` uses a duration format, so the following are all valid values:
 
 ```shell
-17:23:01.780 [scheduled-executor-thread-1] INFO  c.e.i.checks.TemperatureEmitter - Temperature measurement sent: Postcode: AB12 3CD, Temperature: 13.6
+LAN2RF_CHECK_INTERVAL=30s # Check every 30 seconds
+LAN2RF_CHECK_INTERVAL=2m # Check every 2 minutes
+LAN2RF_CHECK_INTERVAL=4h # Check every 4 hours
 ```
 
-Development related information can be found in [docs/development.md](docs/development.md)
+Each time the status data is sent to InfluxDB an `INFO` level log entry is written e.g.
+
+```shell
+19:00:25.478 [DefaultDispatcher-worker-1] INFO  c.e.l.p.influxdb.StatusDataPublisher - Status Data measurements sent at: 2025-11-04T19:00:25.443115704Z
+```
+
+## The Data
+
+<!-- TODO: --> Document which data gets sent and how it is represented in InfluxDB.

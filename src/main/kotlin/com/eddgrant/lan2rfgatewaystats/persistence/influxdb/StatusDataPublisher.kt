@@ -37,7 +37,7 @@ class StatusDataPublisher(
                                     measurements,
                                     WritePrecision.MS
                                 )
-                            LOGGER.debug("Measurements written for timestamp: {}", now)
+                            LOGGER.info("Status Data measurements sent at: {}", now)
                             sink.success()
                         } catch (e: Exception) {
                             sink.error(e)
