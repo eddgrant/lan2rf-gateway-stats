@@ -2,13 +2,12 @@ package com.eddgrant.lan2rfgatewaystats.intergas
 
 import io.kotest.core.spec.style.StringSpec
 import io.micronaut.test.annotation.MockBean
-import io.micronaut.test.extensions.kotest5.MicronautKotest5Extension.getMock
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import io.mockk.every
 import io.mockk.mockk
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import java.time.Duration
+import kotlin.time.toJavaDuration
 
 @MicronautTest(environments = ["lan2rf-integration-test"])
 class LAN2RFRepositoryTest(
@@ -18,27 +17,28 @@ class LAN2RFRepositoryTest(
 ) : StringSpec({
 
     "it returns status data on a schedule" {
-        // Given
-        val intergasServiceMock = getMock(intergasService)
-        every { intergasServiceMock.getStatusData() } returns Mono.just(StatusDataTestFixtures.BASIC)
-
-        val lan2rfConfigurationMock = getMock(lan2rfConfiguration)
-        every { lan2rfConfigurationMock.checkInterval } returns Duration.ofMillis(10)
-
         // When
         val statusDataFlux = lan2rfRepository.getStatusData()
 
         // Then
         StepVerifier.create(statusDataFlux)
-            .expectNext(StatusDataTestFixtures.BASIC)
-            .thenCancel()
-            .verify()
+                    .expectNext(StatusDataTestFixtures.BASIC)
+                    .thenCancel()
+                    .verify()
     }
 
 }) {
     @MockBean(IntergasService::class)
-    fun intergasService(): IntergasService = mockk<IntergasService>()
+    fun intergasService(): IntergasService {
+        val mock = mockk<IntergasService>()
+        every { mock.getStatusData() } returns Mono.just(StatusDataTestFixtures.BASIC)
+        return mock
+    }
 
     @MockBean(LAN2RFConfiguration::class)
-    fun lan2rfConfiguration(): LAN2RFConfiguration = mockk<LAN2RFConfiguration>()
+    fun lan2rfConfiguration(): LAN2RFConfiguration {
+        val mock = mockk<LAN2RFConfiguration>()
+        every { mock.checkInterval } returns kotlin.time.Duration.parse("50ms").toJavaDuration()
+        return mock
+    }
 }
