@@ -111,7 +111,6 @@ tasks.named<Test>("test") {
         excludeTestsMatching("*IntegrationTest")
         excludeTestsMatching("*EndToEnd*")
     }
-    ignoreFailures = true
 }
 
 tasks.named<MicronautDockerfile>("dockerfile") {
