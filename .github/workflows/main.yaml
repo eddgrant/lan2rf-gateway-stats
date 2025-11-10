@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   main-build-and-release:
     uses: ./.github/workflows/build-and-deploy.yaml
@@ -12,3 +16,24 @@ jobs:
       actions: write
       checks: write
       contents: write
+    with:
+      gradle_tasks: check dockerPushVersion dockerPushLatest --stacktrace --warning-mode all
+    secrets:
+      docker_hub_username: ${{ secrets.DOCKER_HUB_USERNAME }}
+      docker_hub_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+  update-docker-hub-documentation:
+    needs: main-build-and-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v5
+
+      - name: Docker Hub Documentation
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          repository: eddgrant/lan2rf-stats-gateway
+          short-description: A simple utility which obtains data from an Intergas LAN2RF device, and sends it to an InfluxDB endpoint.
+          enable-url-completion: true
