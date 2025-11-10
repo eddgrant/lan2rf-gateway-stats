@@ -3,6 +3,10 @@ name: Pull Request build and release
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr-build-and-release:
     uses: ./.github/workflows/build-and-deploy.yaml
@@ -10,3 +14,9 @@ jobs:
       actions: write
       checks: write
       contents: write
+
+    with:
+      gradle_tasks: check dockerPushVersion --stacktrace --warning-mode all
+    secrets:
+      docker_hub_username: ${{ secrets.DOCKER_HUB_USERNAME }}
+      docker_hub_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
