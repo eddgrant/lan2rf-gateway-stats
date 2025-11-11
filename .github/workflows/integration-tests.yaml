@@ -1,0 +1,41 @@
+name: integration-tests
+
+on:
+  workflow_call:
+    secrets:
+      meteomatics_username:
+        required: true
+      meteomatics_password:
+        required: true
+
+jobs:
+  run:
+    permissions:
+      actions: read # Is this needed?
+      checks: write # Needed by test-reporter to create a check which represents the test run.
+      contents: write # Is this needed?
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v5
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+
+    - name: Run Integration Tests
+      run: ./gradlew integrationTest
+
+    - name: Upload integration test results artefacts
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: integration-test-results
+        path: build/test-results/integrationTest
+
+    - name: Publish Integration Test Report
+      uses: dorny/test-reporter@v2
+      if: success() || failure()
+      with:
+        name: Integration Test Results
+        path: build/test-results/integrationTest/TEST-*.xml
+        reporter: java-junit
