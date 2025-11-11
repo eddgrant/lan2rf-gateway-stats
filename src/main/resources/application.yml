@@ -6,7 +6,6 @@ micronaut:
     client:
       connect-timeout: 5s
       read-timeout: 10s
-      log-level: ERROR
     services:
       lan2rf:
         urls:
@@ -18,8 +17,6 @@ micronaut:
 
 logger:
   levels:
-    io: ERROR
-    com: ERROR
     com.eddgrant: INFO
 
 lan2rf:
