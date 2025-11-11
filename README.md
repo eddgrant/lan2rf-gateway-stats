@@ -89,4 +89,104 @@ Each time the status data is sent to InfluxDB an `INFO` level log entry is writt
 
 ## The Data
 
-<!-- TODO: --> Document which data gets sent and how it is represented in InfluxDB.
+The application publishes several types of measurements to InfluxDB, each representing a different aspect of the heating system's status.
+
+### Measurements
+
+All measurements have a `source` value which defaults to "lan2rf". This can be overridden by setting the value of the `LAN2RF_SOURCE` environment variable.
+
+Below is a description of each measurement, its associated tags, and the data it holds.
+
+**`Temperature`**
+
+| Tag (`source`)               | Tag (`location`)                           | Tag (`type`)                                | Field (`value`)                     | Description                                                                                               |
+|:-----------------------------|:-------------------------------------------|:--------------------------------------------|:------------------------------------|:----------------------------------------------------------------------------------------------------------|
+| `${LAN2RF_SOURCE:-"lan2rf"}` | `central_heating`, `tap`, `room1`, `room2` | `RECORDED`, `SETPOINT`, `SETPOINT_OVERRIDE` | The temperature in degrees Celsius. | Stores temperature readings, target setpoints, and temporary overrides for different parts of the system. |
+
+**`Pressure`**
+
+| Tag (`source`)               | Tag (`location`)  | Field (`value`)      | Description                                               |
+|:-----------------------------|:------------------|:---------------------|:----------------------------------------------------------|
+| `${LAN2RF_SOURCE:-"lan2rf"}` | `central_heating` | The pressure in bar. | Stores the water pressure of the central heating circuit. |
+
+**`OperationalStatus`**
+
+| Tag (`source`)               | Tag (`name`)                                                        | Field (`value`)   | Description                                                      |
+|:-----------------------------|:--------------------------------------------------------------------|:------------------|:-----------------------------------------------------------------|
+| `${LAN2RF_SOURCE:-"lan2rf"}` | `LOCKED_OUT`, `PUMP_ACTIVE`, `TAP_FUNCTION_ACTIVE`, `BURNER_ACTIVE` | `true` or `false` | Stores the boolean on/off status for key operational components. |
+
+**`TextStatus`**
+
+| Tag (`source`)               | Tag (`subject`)       | Field (`value`)                                     | Description                                                       |
+|:-----------------------------|:----------------------|:----------------------------------------------------|:------------------------------------------------------------------|
+| `${LAN2RF_SOURCE:-"lan2rf"}` | `STATUS_DISPLAY_CODE` | A string representing the status (e.g., "Standby"). | Stores the human-readable status message displayed by the boiler. |
+
+### Example Flux Queries
+
+You can use the InfluxDB UI or API to query this data. Here are some example Flux queries to get you started.
+
+**1. Get the last recorded central heating temperature:**
+
+```flux
+from(bucket: "intergas")
+  |> range(start: -1h)
+  |> filter(fn: (r) => r["source"] == "lan2rf")
+  |> filter(fn: (r) => r["_measurement"] == "Temperature")
+  |> filter(fn: (r) => r["location"] == "central_heating")
+  |> filter(fn: (r) => r["type"] == "RECORDED")
+  |> last()
+```
+
+**2. See when the burner has been active in the last hour:**
+
+```flux
+from(bucket: "intergas")
+  |> range(start: -1h)
+  |> filter(fn: (r) => r["source"] == "lan2rf")
+  |> filter(fn: (r) => r["_measurement"] == "OperationalStatus")
+  |> filter(fn: (r) => r["subject"] == "BURNER_ACTIVE")
+  |> filter(fn: (r) => r["_value"] == true)
+```
+
+TODO: I don't know how the LAN2RF reports this data. Does it require the burner to be live exactly when the data request is made, or does it remember if the burner has been active within a given timeframe, instead reporting that back?
+Need to understand this as this and the frequency at which data is collected could significantly influence reporting accuracy.
+
+**3. Retrieve the boiler's text status over the last 24 hours:**
+
+```flux
+from(bucket: "intergas")
+  |> range(start: -24h)
+  |> filter(fn: (r) => r["source"] == "lan2rf")
+  |> filter(fn: (r) => r["_measurement"] == "TextStatus")
+  |> filter(fn: (r) => r["subject"] == "STATUS_DISPLAY_CODE")
+  |> distinct(column: "_value")
+```
+
+**4. Graph the recorded room temperature vs. its setpoint and/or setpoint override for "room1":**
+
+```flux
+from(bucket: "intergas")
+  |> range(start: -12h)
+  |> filter(fn: (r) => r["source"] == "lan2rf")
+  |> filter(fn: (r) => r["_measurement"] == "Temperature")
+  |> filter(fn: (r) => r["location"] == "room1")
+  |> filter(fn: (r) => r["type"] == "RECORDED" or r["type"] == "SETPOINT" or r["type"] == "SETPOINT_OVERRIDE")
+  |> pivot(rowKey:["_time"], columnKey: ["type"], valueColumn: "_value")
+```
+
+**5. View all data points for each collection interval:**
+
+This query groups all measurements by their timestamp, creating a wide table that shows the complete state of the system for each time the application published data.
+
+```flux
+from(bucket: "intergas")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["source"] == "lan2rf")
+  |> pivot(
+      rowKey:["_time"],
+      columnKey: ["_measurement"],
+      valueColumn: "_value"
+  )
+  |> sort(columns: ["_time"], desc: true)
+```
+```
