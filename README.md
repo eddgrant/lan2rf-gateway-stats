@@ -43,8 +43,6 @@ docker run --rm \
    eddgrant/lan2rf-gateway-stats:local
 ```
 
-<!-- TODO: Need to update the README from hereon down... -->
-
 Ensure that the InfluxDB variables match the ones used when setting up InfluxDB.
 
 Ensure that you set a valid hostname / IP address for the `LAN2RF_URL` environment variable.
@@ -64,6 +62,7 @@ lan2rf-gateway-stats should start and begin to log its output to the console:
 18:54:27.580 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'io'
 18:54:27.463 [main] INFO  c.e.l.LAN2RFGatewayStatsApp - Starting subscription to LAN2RF data.
 18:54:27.567 [main] INFO  c.e.l.LAN2RFGatewayStatsApp - Subscription to LAN2RF data created.
+18:54:27.623 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 644ms. Server Running: http://9cbacfcd290f:8080
 ```
 
 By default lan2rf-gateway-stats will check the status data every minute.

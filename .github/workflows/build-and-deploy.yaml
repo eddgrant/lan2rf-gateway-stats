@@ -1,11 +1,33 @@
-name: Run tests and build the GraalVM native Docker image.
+name: Run tests and build the Docker image.
 
 on:
   workflow_call:
+    inputs:
+      gradle_tasks:
+        type: string
+        description: The Gradle tasks to execute
+        required: true
+    secrets:
+      docker_hub_username:
+        required: true
+      docker_hub_password:
+        required: true
+
+concurrency:
+  # Limit to a single concurrent invocation to ensure tagging works correctly.
+  group: lan2rf-stats-gateway
+  cancel-in-progress: false
+
+env:
+  # Docker doesn't support the '+' character in image tags, so we can't quite use true semver, so we use a '-' instead. https://github.com/distribution/distribution/issues/1201
+  version_format: ${{ github.event_name == 'pull_request' && format('${{major}}.${{minor}}.${{patch}}-pr.{0}-{1}', github.event.number, github.sha) || '${major}.${minor}.${patch}' }}
 
 jobs:
   unit-tests:
     uses: ./.github/workflows/unit-tests.yaml
+
+  #integration-tests:
+  #  uses: ./.github/workflows/integration-tests.yaml
 
   build:
     permissions:
@@ -14,16 +36,58 @@ jobs:
       contents: write
     needs:
       - unit-tests
+      #- integration-tests
     runs-on: ubuntu-latest
     steps:
+      # Try updating to latest version of Docker to resolve 'Could not push image: missing content-length header for request:' issue.
+      # https://forums.docker.com/t/unexpected-missing-content-length-header-for-request/145907/12
+      - name: Check Docker Version
+        run: docker --version
+
+      - name: Install Latest Docker
+        run: |
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+          sudo apt-get update
+          sudo apt-get install docker-ce
+          sudo systemctl restart docker
+
+      - name: Check Docker Version
+        run: docker --version
+
       - name: Checkout sources
         uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Checkout history and tags for semantic version calculation
 
+      - name: Determine semantic version
+        id: semver
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          bump_each_commit: true
+          #enable_prerelease_mode: ${{ env.enable_prerelease_mode }}
+          version_format: ${{ env.version_format }}
+
+      - name: Output semver debug information
+        run: "echo SEMVER debug info: ${{ steps.semver.outputs.debug_output }}"
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Login to Docker Hub
+        run:  echo ${{ secrets.docker_hub_password }} | docker login --username ${{ secrets.docker_hub_username }} --password-stdin registry.hub.docker.com/library/eddgrant/lan2rf-stats-gateway
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
       # Note: We skip unit and integration tests as we're already run them above.
-      - name: Build GraalVM native image
-        run: ./gradlew --exclude-task test --exclude-task check dockerBuildNative
+      - name: Build with Gradle
+        run: ./gradlew --exclude-task test --exclude-task check -Pversion="${{ steps.semver.outputs.version }}" ${{ inputs.gradle_tasks }}
+
+      - name: Push tag to repository
+        run: |
+          git tag ${{ steps.semver.outputs.version }}
+          git push origin ${{ steps.semver.outputs.version }}
