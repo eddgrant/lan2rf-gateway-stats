@@ -59,6 +59,8 @@ data class StatusData(
     private fun isBitSet(value: Int, bitIndex: Int) = ((value shr bitIndex) and 1) == 1
 
     companion object {
+        const val STATUS_DISPLAY_CODE_NAME = "STATUS_DISPLAY_CODE"
+
         const val STATUS_TEXT_OPEN_THERM = "OpenTherm"
         const val STATUS_TEXT_BOILER_EXTERNAL = "Boiler External"
         const val STATUS_TEXT_FROST = "Frost"
@@ -73,6 +75,11 @@ data class StatusData(
         const val STATUS_TEXT_POSTRUN_CENTRAL_HEATING = "Postrun Central Heating"
         const val STATUS_TEXT_BOILER_INTERNAL = "Boiler Internal"
         const val STATUS_TEXT_BUFFER = "Buffer"
+
+        const val IO_STATUS_NAME_LOCKED_OUT = "LOCKED_OUT"
+        const val IO_STATUS_NAME_PUMP_ACTIVE = "PUMP_ACTIVE"
+        const val IO_STATUS_NAME_TAP_FUNCTION_ACTIVE = "TAP_FUNCTION_ACTIVE"
+        const val IO_STATUS_NAME_BURNER_ACTIVE = "BURNER_ACTIVE"
 
         const val IO_STATUS_BIT_LOCKED_OUT = 0
         const val IO_STATUS_BIT_PUMP_ACTIVE = 1
