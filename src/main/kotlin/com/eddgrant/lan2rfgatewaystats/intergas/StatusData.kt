@@ -49,26 +49,35 @@ data class StatusData(
     fun room2Temperature(): Double = combineMsbAndLsb(room2TemperatureMsb, room2Temperaturelsb)
     fun room2TemperatureSetpoint(): Double = combineMsbAndLsb(room2TemperatureSetpointMsb, room2TemperatureSetpointLsb)
     fun room2TemperatureSetpointOverride(): Double = combineMsbAndLsb(room2TemperatureSetpointOverrideMsb, room2TemperatureSetpointOverrideLsb)
-    fun isLockedOut(): Boolean = io % 2 != 0
+    fun isLockedOut(): Boolean = isBitSet(io, IO_STATUS_BIT_LOCKED_OUT)
+    fun isPumpActive(): Boolean = isBitSet(io, IO_STATUS_BIT_PUMP_ACTIVE)
+    fun isTapFunctionActive(): Boolean = isBitSet(io, IO_STATUS_BIT_TAP_FUNCTION_ACTIVE)
+    fun isBurnerActive(): Boolean = isBitSet(io, IO_STATUS_BIT_BURNER_ACTIVE)
     fun getStatusDisplayCode(): String = statusDisplayCodes.getOrDefault(statusDisplayCode, "Unknown")
 
     private fun combineMsbAndLsb(msb: Int, lsb: Int) = ((msb shl 8) xor lsb) / 100.0
+    private fun isBitSet(value: Int, bitIndex: Int) = ((value shr bitIndex) and 1) == 1
 
     companion object {
-        val STATUS_TEXT_OPEN_THERM = "OpenTherm"
-        val STATUS_TEXT_BOILER_EXTERNAL = "Boiler External"
-        val STATUS_TEXT_FROST = "Frost"
-        val STATUS_TEXT_CENTRAL_HEATING_RF = "Central Heating RF"
-        val STATUS_TEXT_TAPWATER_INTERNAL = "Tapwater Internal"
-        val STATUS_TEXT_SENSOR_TEST = "Sensor Test"
-        val STATUS_TEXT_CENTRAL_HEATING = "Central Heating"
-        val STATUS_TEXT_STANDBY = "Standby"
-        val STATUS_TEXT_POSTRUN_BOILER = "Postrun Boiler"
-        val STATUS_TEXT_SERVICE = "Service"
-        val STATUS_TEXT_TAP_WATER = "Tap Water"
-        val STATUS_TEXT_POSTRUN_CENTRAL_HEATING = "Postrun Central Heating"
-        val STATUS_TEXT_BOILER_INTERNAL = "Boiler Internal"
-        val STATUS_TEXT_BUFFER = "Buffer"
+        const val STATUS_TEXT_OPEN_THERM = "OpenTherm"
+        const val STATUS_TEXT_BOILER_EXTERNAL = "Boiler External"
+        const val STATUS_TEXT_FROST = "Frost"
+        const val STATUS_TEXT_CENTRAL_HEATING_RF = "Central Heating RF"
+        const val STATUS_TEXT_TAPWATER_INTERNAL = "Tapwater Internal"
+        const val STATUS_TEXT_SENSOR_TEST = "Sensor Test"
+        const val STATUS_TEXT_CENTRAL_HEATING = "Central Heating"
+        const val STATUS_TEXT_STANDBY = "Standby"
+        const val STATUS_TEXT_POSTRUN_BOILER = "Postrun Boiler"
+        const val STATUS_TEXT_SERVICE = "Service"
+        const val STATUS_TEXT_TAP_WATER = "Tap Water"
+        const val STATUS_TEXT_POSTRUN_CENTRAL_HEATING = "Postrun Central Heating"
+        const val STATUS_TEXT_BOILER_INTERNAL = "Boiler Internal"
+        const val STATUS_TEXT_BUFFER = "Buffer"
+
+        const val IO_STATUS_BIT_LOCKED_OUT = 0
+        const val IO_STATUS_BIT_PUMP_ACTIVE = 1
+        const val IO_STATUS_BIT_TAP_FUNCTION_ACTIVE = 2
+        const val IO_STATUS_BIT_BURNER_ACTIVE = 3
 
         private val statusDisplayCodes: Map<Int, String> = mapOf(
             0 to STATUS_TEXT_OPEN_THERM,
