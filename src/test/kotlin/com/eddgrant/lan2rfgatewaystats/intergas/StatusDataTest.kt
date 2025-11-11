@@ -65,13 +65,44 @@ class StatusDataTest(
         assertEquals(25.5, statusData.room2TemperatureSetpointOverride())
     }
 
+    // IO tests
     "it determines when the the boiler is not in a locked out state" {
         assertFalse(statusData.isLockedOut())
     }
 
     "it determines when the the boiler is in a locked out state" {
-        assertTrue(statusData.copy(io = 1).isLockedOut())
+        val lockedOut = statusData.copy(io = 1)
+        assertTrue(lockedOut.isLockedOut())
     }
+
+    "it determines when the the pump is active" {
+        val pumpActive = statusData.copy(io = 2)
+        assertTrue(pumpActive.isPumpActive())
+    }
+
+    "it determines when the the tap function is active" {
+        val tapFunctionActive = statusData.copy(io = 4)
+        assertTrue(tapFunctionActive.isTapFunctionActive())
+    }
+
+    "it determines when the the burner is active" {
+        val burnerActive = statusData.copy(io = 8)
+        assertTrue(burnerActive.isBurnerActive())
+    }
+
+    /**
+     * It might not be possible for _all_ IO states to be active at once,
+     * as some states might be mutually exclusive e.g. tap function + burner,
+     * but I think it is possible for more than 1 to be e.g. pump + burner.
+     */
+    "it determines when all IO are active" {
+        val burnerActive = statusData.copy(io = 15)
+        assertTrue(burnerActive.isLockedOut())
+        assertTrue(burnerActive.isPumpActive())
+        assertTrue(burnerActive.isTapFunctionActive())
+        assertTrue(burnerActive.isBurnerActive())
+    }
+    // End of IO tests
 
     "it displays the correct status display code" {
         assertEquals(statusData.copy(statusDisplayCode = 0).getStatusDisplayCode(), StatusData.STATUS_TEXT_OPEN_THERM)

@@ -2,6 +2,11 @@ package com.eddgrant.lan2rfgatewaystats.persistence.influxdb
 
 import com.eddgrant.lan2rfgatewaystats.intergas.LAN2RFConfiguration
 import com.eddgrant.lan2rfgatewaystats.intergas.StatusData
+import com.eddgrant.lan2rfgatewaystats.intergas.StatusData.Companion.IO_STATUS_NAME_BURNER_ACTIVE
+import com.eddgrant.lan2rfgatewaystats.intergas.StatusData.Companion.IO_STATUS_NAME_LOCKED_OUT
+import com.eddgrant.lan2rfgatewaystats.intergas.StatusData.Companion.IO_STATUS_NAME_PUMP_ACTIVE
+import com.eddgrant.lan2rfgatewaystats.intergas.StatusData.Companion.IO_STATUS_NAME_TAP_FUNCTION_ACTIVE
+import com.eddgrant.lan2rfgatewaystats.intergas.StatusData.Companion.STATUS_DISPLAY_CODE_NAME
 import com.eddgrant.lan2rfgatewaystats.persistence.influxdb.Temperature.Type.*
 import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.kotlin.InfluxDBClientKotlin
@@ -115,7 +120,11 @@ class StatusDataPublisher(
                 statusDataValue.centralHeatingPressure(),
                 now
             ),
-            Status(lan2RFConfiguration.source, statusDataValue.getStatusDisplayCode(), now)
+            TextStatus(lan2RFConfiguration.source, STATUS_DISPLAY_CODE_NAME, statusDataValue.getStatusDisplayCode(), now),
+            OperationalStatus(lan2RFConfiguration.source, IO_STATUS_NAME_LOCKED_OUT, statusDataValue.isLockedOut(), now),
+            OperationalStatus(lan2RFConfiguration.source, IO_STATUS_NAME_PUMP_ACTIVE, statusDataValue.isPumpActive(), now),
+            OperationalStatus(lan2RFConfiguration.source, IO_STATUS_NAME_TAP_FUNCTION_ACTIVE, statusDataValue.isTapFunctionActive(), now),
+            OperationalStatus(lan2RFConfiguration.source, IO_STATUS_NAME_BURNER_ACTIVE, statusDataValue.isBurnerActive(), now)
         )
         return measurements
     }
