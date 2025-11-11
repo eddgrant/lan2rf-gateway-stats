@@ -2,10 +2,18 @@ package com.eddgrant.lan2rfgatewaystats.intergas
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
 import io.micronaut.http.client.annotation.Client
 import reactor.core.publisher.Mono
 
 @Client("lan2rf")
+// TODO: See if adding this header removes the ERROR logs from the HTTP client.
+/**
+ * The LAN2RF closes the connection after each HTTP response. This seems
+ * to confuse Micronaut's HTTP client, which then logs an error, despite the HTTP
+ * response being successful. To mitigate this we add this header to the request.
+ */
+@Header(name = "Connection", value = "close")
 interface LAN2RFClient {
 
     /**
