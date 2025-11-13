@@ -1,13 +1,14 @@
 package com.eddgrant.lan2rfgatewaystats.intergas
 
 import io.kotest.core.spec.style.StringSpec
+import io.micronaut.http.client.exceptions.HttpClientException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import io.mockk.every
 import io.mockk.mockk
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import kotlin.time.toJavaDuration
+import java.time.Duration
 
 @MicronautTest(environments = ["lan2rf-integration-test"])
 class LAN2RFRepositoryTest(
@@ -17,28 +18,49 @@ class LAN2RFRepositoryTest(
 ) : StringSpec({
 
     "it returns status data on a schedule" {
-        // When
-        val statusDataFlux = lan2rfRepository.getStatusData()
+        // Given
+        every { intergasService.getStatusData() } returns Mono.just(StatusDataTestFixtures.BASIC)
 
-        // Then
-        StepVerifier.create(statusDataFlux)
-                    .expectNext(StatusDataTestFixtures.BASIC)
-                    .thenCancel()
-                    .verify()
+        // When / Then
+        StepVerifier.withVirtualTime { lan2rfRepository.getStatusData() }
+            .expectSubscription()
+            .thenAwait(lan2rfConfiguration.checkInterval)
+            .expectNext(StatusDataTestFixtures.BASIC)
+            .thenCancel()
+            .verify()
+    }
+
+    "it continues to poll for data when there is a connect exception" {
+        // Given
+        every { intergasService.getStatusData() } returnsMany listOf(
+            Mono.error(HttpClientException("Connect Error")),
+            Mono.just(StatusDataTestFixtures.BASIC)
+        )
+
+        // When / Then
+        StepVerifier.withVirtualTime { lan2rfRepository.getStatusData() }
+            .expectSubscription()
+            // First tick. An error is emitted and then swallowed by the 'onErrorResume' operator.
+            // The StepVerifier does not see the error and the stream does not complete.
+            .thenAwait(lan2rfConfiguration.checkInterval)
+
+            // Second tick. A value is successfully emitted.
+            .thenAwait(lan2rfConfiguration.checkInterval)
+            .expectNext(StatusDataTestFixtures.BASIC)
+            .thenCancel()
+            .verify()
     }
 
 }) {
     @MockBean(IntergasService::class)
     fun intergasService(): IntergasService {
-        val mock = mockk<IntergasService>()
-        every { mock.getStatusData() } returns Mono.just(StatusDataTestFixtures.BASIC)
-        return mock
+        return mockk<IntergasService>()
     }
 
     @MockBean(LAN2RFConfiguration::class)
     fun lan2rfConfiguration(): LAN2RFConfiguration {
         val mock = mockk<LAN2RFConfiguration>()
-        every { mock.checkInterval } returns kotlin.time.Duration.parse("50ms").toJavaDuration()
+        every { mock.checkInterval } returns Duration.ofMillis(50)
         return mock
     }
 }
