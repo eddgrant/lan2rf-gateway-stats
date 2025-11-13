@@ -57,6 +57,7 @@ lan2rf-gateway-stats should start and begin to log its output to the console:
 | |\/| | |/ __| '__/ _ \| '_ \ / _` | | | | __|
 | |  | | | (__| | | (_) | | | | (_| | |_| | |_ 
 |_|  |_|_|\___|_|  \___/|_| |_|\__,_|\__,_|\__|
+18:54:27.573 [main] INFO  c.e.l.intergas.LAN2RFConfiguration - LAN2RF Configuration: source='lan2rf', room1Name='room1_default_name', room2Name='room2_default_name', checkInterval='PT30S'
 18:54:27.578 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'com'
 18:54:27.579 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'com.eddgrant'
 18:54:27.580 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'io'
