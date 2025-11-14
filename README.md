@@ -34,13 +34,14 @@ To run the lan2rf-gateway-stats Docker image run the following command:
 ```shell
 docker run --rm \
   --net=lan2rf-gateway-stats \
+  --env LOGGERS_LEVEL_COM_EDDGRANT=DEBUG \
   --env LAN2RF_CHECK_INTERVAL=30s \
   --env LAN2RF_URL="http://192.168.2.58" \
   --env INFLUXDB_ORG="my-influxdb-org" \
   --env INFLUXDB_BUCKET="intergas" \
   --env INFLUXDB_TOKEN="my-very-secure-influxdb-token" \
   --env INFLUXDB_URL="http://influxdb:8086?connectTimeout=5S&readTimeout=5S&writeTimeout=5S" \
-   eddgrant/lan2rf-gateway-stats:local
+    registry.hub.docker.com//eddgrant/lan2rf-gateway-stats:local
 ```
 
 Ensure that the InfluxDB variables match the ones used when setting up InfluxDB.
@@ -192,4 +193,27 @@ from(bucket: "intergas")
   )
   |> sort(columns: ["_time"], desc: true)
 ```
+
+## Debugging
+
+If you want to see what data is being sent to InfluxDB, without having to query InfluxDB itself. You can configure `DEBUG` level logging on the `StatusDataPublisher` class logger. This will emit a log entry containing the measurement data, each time it is sent to InfluxDB e.g.
+
+```shell
+19:29:40.034 [DefaultDispatcher-worker-1] DEBUG c.e.l.p.influxdb.StatusDataPublisher - Measurements: [
+Temperature(source=lan2rf, location=central_heating, value=52.25, type=RECORDED, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=room1, value=20.0, type=RECORDED, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=room2, value=327.67, type=RECORDED, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=tap, value=36.37, type=RECORDED, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=room1, value=20.0, type=SETPOINT, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=room1, value=0.0, type=SETPOINT_OVERRIDE, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=room2, value=327.67, type=SETPOINT, time=2025-11-14T19:29:39.979889657Z),
+Temperature(source=lan2rf, location=room2, value=0.0, type=SETPOINT_OVERRIDE, time=2025-11-14T19:29:39.979889657Z),
+Pressure(source=lan2rf, subject=central_heating, value=1.25, time=2025-11-14T19:29:39.979889657Z),
+TextStatus(source=lan2rf, subject=STATUS_DISPLAY_CODE, value=Standby, time=2025-11-14T19:29:39.979889657Z),
+OperationalStatus(source=lan2rf, subject=LOCKED_OUT, active=false, time=2025-11-14T19:29:39.979889657Z),
+OperationalStatus(source=lan2rf, subject=PUMP_ACTIVE, active=false, time=2025-11-14T19:29:39.979889657Z),
+OperationalStatus(source=lan2rf, subject=TAP_FUNCTION_ACTIVE, active=false, time=2025-11-14T19:29:39.979889657Z),
+OperationalStatus(source=lan2rf, subject=BURNER_ACTIVE, active=false, time=2025-11-14T19:29:39.979889657Z)]
 ```
+
+_Note:_ The above log entry excerpt has had carriage returns added to aid readability. The log entry is written on a single line in the app.
