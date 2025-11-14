@@ -37,8 +37,8 @@ class LAN2RFConfiguration {
         private val LOGGER = LoggerFactory.getLogger(LAN2RFConfiguration::class.java)
 
         const val LAN2RF_DEFAULT_SOURCE_NAME = "lan2rf"
-        const val ROOM_1_DEFAULT_NAME = "room1_default_name"
-        const val ROOM_2_DEFAULT_NAME = "room2_default_name"
+        const val ROOM_1_DEFAULT_NAME = "room1"
+        const val ROOM_2_DEFAULT_NAME = "room2"
         val DEFAULT_CHECK_INTERVAL = KotlinDuration.parse("1m").toJavaDuration()
     }
 }

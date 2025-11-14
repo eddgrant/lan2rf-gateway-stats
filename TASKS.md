@@ -9,8 +9,9 @@
 7. ~~influxdb.StatusDataEmitter: Rename?~~
 8. ~~Fix failing tests~~
 9. ~~Be resilient to errors, as it seems that a single error can currently cause the whole application to fail.~~
-10. On startup, log the configured check interval.
-11. Add a DEBUG level log in StatusDataPublisher, logging the data that is sent to InfluxDB.
+10. ~~On startup, log the configured check interval.~~
+11. ~~Set default room names to more sensible defaults.~~
+12. Add a DEBUG level log in StatusDataPublisher, logging the data that is sent to InfluxDB.
 12. Get the README uploading to Docker hub
 13. Write and publish a blog post about this project
 14. Support consumption of data from LAN2RF devices which have basic auth enabled
