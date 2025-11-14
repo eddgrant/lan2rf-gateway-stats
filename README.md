@@ -1,6 +1,6 @@
 # lan2rf-gateway-stats
 
-A simple utility which obtains data from an Intergas LAN2RF device, and sends it to an InfluxDB endpoint.
+A simple utility which obtains data from an Intergas LAN2RF device, and sends it to InfluxDB.
 
 # How to use it
 
