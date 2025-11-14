@@ -34,14 +34,13 @@ To run the lan2rf-gateway-stats Docker image run the following command:
 ```shell
 docker run --rm \
   --net=lan2rf-gateway-stats \
-  --env LOGGERS_LEVEL_COM_EDDGRANT=DEBUG \
   --env LAN2RF_CHECK_INTERVAL=30s \
   --env LAN2RF_URL="http://192.168.2.58" \
   --env INFLUXDB_ORG="my-influxdb-org" \
   --env INFLUXDB_BUCKET="intergas" \
   --env INFLUXDB_TOKEN="my-very-secure-influxdb-token" \
   --env INFLUXDB_URL="http://influxdb:8086?connectTimeout=5S&readTimeout=5S&writeTimeout=5S" \
-    registry.hub.docker.com//eddgrant/lan2rf-gateway-stats:local
+    eddgrant/lan2rf-gateway-stats:local
 ```
 
 Ensure that the InfluxDB variables match the ones used when setting up InfluxDB.
