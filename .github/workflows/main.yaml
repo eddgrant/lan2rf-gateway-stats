@@ -34,6 +34,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          repository: eddgrant/lan2rf-stats-gateway
+          repository: eddgrant/lan2rf-gateway-stats
           short-description: A simple utility which obtains data from an Intergas LAN2RF device, and sends it to an InfluxDB endpoint.
           enable-url-completion: true
