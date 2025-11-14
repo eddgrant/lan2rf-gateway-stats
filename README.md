@@ -57,7 +57,7 @@ lan2rf-gateway-stats should start and begin to log its output to the console:
 | |\/| | |/ __| '__/ _ \| '_ \ / _` | | | | __|
 | |  | | | (__| | | (_) | | | | (_| | |_| | |_ 
 |_|  |_|_|\___|_|  \___/|_| |_|\__,_|\__,_|\__|
-18:54:27.573 [main] INFO  c.e.l.intergas.LAN2RFConfiguration - LAN2RF Configuration: source='lan2rf', room1Name='room1_default_name', room2Name='room2_default_name', checkInterval='PT30S'
+18:54:27.573 [main] INFO  c.e.l.intergas.LAN2RFConfiguration - LAN2RF Configuration: source='lan2rf', room1Name='room1', room2Name='room2', checkInterval='PT30S'
 18:54:27.578 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'com'
 18:54:27.579 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'com.eddgrant'
 18:54:27.580 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'io'
@@ -103,6 +103,8 @@ Below is a description of each measurement, its associated tags, and the data it
 | Tag (`source`)               | Tag (`location`)                           | Tag (`type`)                                | Field (`value`)                     | Description                                                                                               |
 |:-----------------------------|:-------------------------------------------|:--------------------------------------------|:------------------------------------|:----------------------------------------------------------------------------------------------------------|
 | `${LAN2RF_SOURCE:-"lan2rf"}` | `central_heating`, `tap`, `room1`, `room2` | `RECORDED`, `SETPOINT`, `SETPOINT_OVERRIDE` | The temperature in degrees Celsius. | Stores temperature readings, target setpoints, and temporary overrides for different parts of the system. |
+
+The `location` tags `room1` and `room2` use default names of `room1` and `room2`. These can be overridden by setting the `LAN2RF_ROOM1_NAME` and `LAN2RF_ROOM2_NAME` environment variables.
 
 **`Pressure`**
 
