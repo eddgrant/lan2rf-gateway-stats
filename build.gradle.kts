@@ -9,7 +9,7 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2"
     id("io.micronaut.application") version "4.6.1"
     id("io.micronaut.aot") version "4.6.1"
-    id("com.bmuschko.docker-remote-api") version "9.4.0" // apply false
+    id("com.bmuschko.docker-remote-api") version "10.0.0" // apply false
 }
 
 group = "com.eddgrant.lan2rfgatewaystats"
