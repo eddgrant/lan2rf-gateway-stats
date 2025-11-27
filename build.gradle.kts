@@ -80,7 +80,13 @@ allOpen {
     annotations("jakarta.inject.Singleton")
 }
 
-graalvmNative.toolchainDetection = true
+graalvmNative {
+    toolchainDetection = true
+    binaries.all {
+        // Ensure the image is built for maximum machine type compatibility.
+        buildArgs.add("-march=compatibility")
+    }
+}
 micronaut {
     version("$micronautVersion")
     runtime("netty")
