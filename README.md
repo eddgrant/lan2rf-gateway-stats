@@ -4,6 +4,8 @@ A simple utility which obtains data from an Intergas LAN2RF device, and sends it
 
 # How to use it
 
+The application is published on Docker Hub as the [https://hub.docker.com/r/eddgrant/lan2rf-gateway-stats) image.
+
 ## Run InfluxDB locally
 
 An InfluxDB endpoint is required to collect temperature data. You might have an InfluxDB setup already, but if not one can be easily created by running the following commands:
