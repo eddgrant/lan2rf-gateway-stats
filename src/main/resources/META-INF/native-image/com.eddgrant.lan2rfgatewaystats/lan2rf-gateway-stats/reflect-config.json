@@ -1,0 +1,32 @@
+[
+  {
+    "name": "com.eddgrant.lan2rfgatewaystats.persistence.influxdb.OperationalStatus",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.eddgrant.lan2rfgatewaystats.persistence.influxdb.Pressure",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.eddgrant.lan2rfgatewaystats.persistence.influxdb.Temperature",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.eddgrant.lan2rfgatewaystats.persistence.influxdb.Temperature$Type",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.eddgrant.lan2rfgatewaystats.persistence.influxdb.TextStatus",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  }
+]

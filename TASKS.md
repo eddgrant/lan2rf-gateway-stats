@@ -18,6 +18,9 @@
 15. Identify areas where tests are missing and write them
 16. ~~Build the app as a Docker image and test that it works~~
 17. Can the built Docker image be tested conveniently as a Gradle task? What did I do for influxdb-weather-ingestor?
+18. ~~Make native image work on Fitlet~~
+    ~~> The current machine does not support all of the following CPU features that are required by the image: [CX8, CMOV, FXSR, MMX, SSE, SSE2, SSE3, SSSE3, SSE4_1, SSE4_2, POPCNT, LZCNT, AVX, AVX2, BMI1, BMI2, FMA].~~
+19. ~~Figure out why InfluxDB client thinks there's no data when run as a virtual image:~~
 
 **Note:** Do not upgrade to jvm-test-suite plugin yet. It's in incubating and doesn't work very well! When we tried to use it IntelliJ was unable to resolve classpath dependencies
 

@@ -80,7 +80,13 @@ allOpen {
     annotations("jakarta.inject.Singleton")
 }
 
-graalvmNative.toolchainDetection = true
+graalvmNative {
+    toolchainDetection = true
+    binaries.all {
+        // Ensure the image is built for maximum machine type compatibility.
+        buildArgs.add("-march=compatibility")
+    }
+}
 micronaut {
     version("$micronautVersion")
     runtime("netty")
@@ -142,23 +148,25 @@ tasks.check {
 }
 
 
-tasks.named<DockerBuildImage>("dockerBuild") {
-    imageId.set("eddgrant/${project.name}")
-    images.add("${dockerRegistryHost}/eddgrant/${project.name}:${project.version}")
-    images.add("${dockerRegistryHost}/eddgrant/${project.name}:latest")
-    images.add("${dockerRegistryHost}/eddgrant/${project.name}:local")
-    mustRunAfter(tasks.withType(Test::class.java))
+val configureDockerImageNames: (DockerBuildImage) -> Unit = {
+    it.images.add("eddgrant/${project.name}:local")
+    it.images.add("${dockerRegistryHost}/eddgrant/${project.name}:${project.version}")
+    it.images.add("${dockerRegistryHost}/eddgrant/${project.name}:latest")
+    it.mustRunAfter(tasks.withType(Test::class.java))
 }
 
+tasks.named<DockerBuildImage>("dockerBuild", configureDockerImageNames)
+tasks.named<DockerBuildImage>("dockerBuildNative", configureDockerImageNames)
+
 tasks.register<DockerPushImage>("dockerPushVersion") {
-    dependsOn("dockerBuild")
+    dependsOn("dockerBuildNative")
     images.set(listOf(
         "${dockerRegistryHost}/eddgrant/${project.name}:${project.version}",
     ))
 }
 
 tasks.register<DockerPushImage>("dockerPushLatest") {
-    dependsOn("dockerBuild")
+    dependsOn("dockerBuildNative")
     images.set(listOf(
         "${dockerRegistryHost}/eddgrant/${project.name}:latest",
     ))
