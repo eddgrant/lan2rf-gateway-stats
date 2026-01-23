@@ -28,11 +28,13 @@ class StatusDataPublisherTest : FunSpec({
     val underTest = StatusDataPublisher(influxDBClientKotlin, lan2RFConfiguration)
 
     beforeTest {
+        clearMocks(influxDBClientKotlin, lan2RFConfiguration, writeApi)
         every { lan2RFConfiguration.source } returns "test-source"
     }
 
-    test("Successfully writes measurements to InfluxDB") {
+    test("Successfully writes all measurements to InfluxDB when all measurements are enabled") {
         // Given
+        every { lan2RFConfiguration.measurements } returns LAN2RFConfiguration.Measurements()
         val statusData = StatusDataTestFixtures.BASIC
         val statusDataFlux = Flux.just(statusData)
 
@@ -43,7 +45,7 @@ class StatusDataPublisherTest : FunSpec({
 
         // Then
         StepVerifier.create(result)
-                    .verifyComplete()
+            .verifyComplete()
 
         val measurementsSlot = slot<Set<Any>>()
         coVerify(exactly = 1) {
@@ -51,7 +53,39 @@ class StatusDataPublisherTest : FunSpec({
         }
 
         val capturedMeasurements = measurementsSlot.captured
-        val expectedMeasurements = buildExpectedMeasurements(statusData, lan2RFConfiguration.source)
+        val expectedMeasurements = buildExpectedBoilerMeasurements(statusData, lan2RFConfiguration.source) +
+                buildExpectedRoom1Measurements(statusData, lan2RFConfiguration.source) +
+                buildExpectedRoom2Measurements(statusData, lan2RFConfiguration.source)
+
+        capturedMeasurements shouldHaveSize expectedMeasurements.size
+
+        val comparableCaptured = capturedMeasurements.map { it.toComparable() }.toSet()
+        val comparableExpected = expectedMeasurements.map { it.toComparable() }.toSet()
+        comparableCaptured shouldContainExactlyInAnyOrder comparableExpected
+    }
+
+    test("Successfully writes only boiler measurements to InfluxDB when only boiler measurements are enabled") {
+        // Given
+        every { lan2RFConfiguration.measurements } returns LAN2RFConfiguration.Measurements(boiler = true, room1 = false, room2 = false)
+        val statusData = StatusDataTestFixtures.BASIC
+        val statusDataFlux = Flux.just(statusData)
+
+        every { influxDBClientKotlin.getWriteKotlinApi() } returns writeApi
+
+        // When
+        val result = underTest.publishAsDiscreteMeasurements(statusDataFlux)
+
+        // Then
+        StepVerifier.create(result)
+            .verifyComplete()
+
+        val measurementsSlot = slot<Set<Any>>()
+        coVerify(exactly = 1) {
+            writeApi.writeMeasurements(capture(measurementsSlot), WritePrecision.MS)
+        }
+
+        val capturedMeasurements = measurementsSlot.captured
+        val expectedMeasurements = buildExpectedBoilerMeasurements(statusData, lan2RFConfiguration.source)
 
         capturedMeasurements shouldHaveSize expectedMeasurements.size
 
@@ -73,23 +107,17 @@ class StatusDataPublisherTest : FunSpec({
 
         // Then
         StepVerifier.create(result)
-                    .expectError(RuntimeException::class.java)
-                    .verify()
+            .expectError(RuntimeException::class.java)
+            .verify()
     }
 
 })
 
-private fun buildExpectedMeasurements(statusData: StatusData, source: String): Set<Any> {
+private fun buildExpectedBoilerMeasurements(statusData: StatusData, source: String): Set<Any> {
     val now = Instant.now() // Ignored in comparison
     return setOf(
         Temperature(source, "central_heating", statusData.centralHeatingTemperature(), Temperature.Type.RECORDED, now),
-        Temperature(source, "room1", statusData.room1Temperature(), Temperature.Type.RECORDED, now),
-        Temperature(source, "room2", statusData.room2Temperature(), Temperature.Type.RECORDED, now),
         Temperature(source, "tap", statusData.tapTemperature(), Temperature.Type.RECORDED, now),
-        Temperature(source, "room1", statusData.room1TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
-        Temperature(source, "room1", statusData.room1TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now),
-        Temperature(source, "room2", statusData.room2TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
-        Temperature(source, "room2", statusData.room2TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now),
 
         Pressure(source, "central_heating", statusData.centralHeatingPressure(), now),
 
@@ -101,6 +129,25 @@ private fun buildExpectedMeasurements(statusData: StatusData, source: String): S
         OperationalStatus(source, IO_STATUS_NAME_BURNER_ACTIVE, statusData.isBurnerActive(), now)
     )
 }
+
+private fun buildExpectedRoom1Measurements(statusData: StatusData, source: String): Set<Any> {
+    val now = Instant.now() // Ignored in comparison
+    return setOf(
+        Temperature(source, "room1", statusData.room1Temperature(), Temperature.Type.RECORDED, now),
+        Temperature(source, "room1", statusData.room1TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
+        Temperature(source, "room1", statusData.room1TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now)
+    )
+}
+
+private fun buildExpectedRoom2Measurements(statusData: StatusData, source: String): Set<Any> {
+    val now = Instant.now() // Ignored in comparison
+    return setOf(
+        Temperature(source, "room2", statusData.room2Temperature(), Temperature.Type.RECORDED, now),
+        Temperature(source, "room2", statusData.room2TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
+        Temperature(source, "room2", statusData.room2TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now)
+    )
+}
+
 
 private fun Any.toComparable(): Any {
     val fixedTime = Instant.EPOCH
