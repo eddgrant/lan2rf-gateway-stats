@@ -30,12 +30,12 @@ class StatusDataPublisher(
 
     fun publishAsDiscreteMeasurements(statusData: Flux<StatusData>): Flux<Void> {
         return statusData
-            .flatMap { statusDataValue ->
+            .flatMap { statusData ->
                 Mono.create<Void> { sink ->
                     val job = CoroutineScope(Dispatchers.IO).launch {
                         try {
                             val now = now()
-                            val measurements = asMeasurements(statusDataValue, now)
+                            val measurements = asMeasurements(statusData, now)
                             influxDBClientKotlin
                                 .getWriteKotlinApi()
                                 .writeMeasurements(
@@ -55,10 +55,29 @@ class StatusDataPublisher(
     }
 
     private fun asMeasurements(
+        statusData: StatusData,
+        now: Instant
+    ): Set<Any> {
+        return buildSet {
+            if (lan2RFConfiguration.measurements.boiler) {
+                addAll(createBoilerMeasurements(statusData, now))
+            }
+
+            if (lan2RFConfiguration.measurements.room1) {
+                addAll(createRoom1Measurements(statusData, now))
+            }
+
+            if (lan2RFConfiguration.measurements.room2) {
+                addAll(createRoom2Measurements(statusData, now))
+            }
+        }
+    }
+
+    private fun createBoilerMeasurements(
         statusDataValue: StatusData,
         now: Instant
     ): Set<Any> {
-        val measurements = setOf(
+        return setOf(
             Temperature(
                 lan2RFConfiguration.source,
                 "central_heating",
@@ -68,51 +87,9 @@ class StatusDataPublisher(
             ),
             Temperature(
                 lan2RFConfiguration.source,
-                "room1",
-                statusDataValue.room1Temperature(),
-                RECORDED,
-                now
-            ),
-            Temperature(
-                lan2RFConfiguration.source,
-                "room2",
-                statusDataValue.room2Temperature(),
-                RECORDED,
-                now
-            ),
-            Temperature(
-                lan2RFConfiguration.source,
                 "tap",
                 statusDataValue.tapTemperature(),
                 RECORDED,
-                now
-            ),
-            Temperature(
-                lan2RFConfiguration.source,
-                "room1",
-                statusDataValue.room1TemperatureSetpoint(),
-                SETPOINT,
-                now
-            ),
-            Temperature(
-                lan2RFConfiguration.source,
-                "room1",
-                statusDataValue.room1TemperatureSetpointOverride(),
-                SETPOINT_OVERRIDE,
-                now
-            ),
-            Temperature(
-                lan2RFConfiguration.source,
-                "room2",
-                statusDataValue.room2TemperatureSetpoint(),
-                SETPOINT,
-                now
-            ),
-            Temperature(
-                lan2RFConfiguration.source,
-                "room2",
-                statusDataValue.room2TemperatureSetpointOverride(),
-                SETPOINT_OVERRIDE,
                 now
             ),
             Pressure(
@@ -127,7 +104,66 @@ class StatusDataPublisher(
             OperationalStatus(lan2RFConfiguration.source, IO_STATUS_NAME_TAP_FUNCTION_ACTIVE, statusDataValue.isTapFunctionActive(), now),
             OperationalStatus(lan2RFConfiguration.source, IO_STATUS_NAME_BURNER_ACTIVE, statusDataValue.isBurnerActive(), now)
         )
-        return measurements
+    }
+
+    private fun createRoom1Measurements(
+        statusDataValue: StatusData,
+        now: Instant
+    ): Set<Any> {
+        val room1 = "room1"
+        return setOf(
+            Temperature(
+                lan2RFConfiguration.source,
+                room1,
+                statusDataValue.room1Temperature(),
+                RECORDED,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                room1,
+                statusDataValue.room1TemperatureSetpoint(),
+                SETPOINT,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                room1,
+                statusDataValue.room1TemperatureSetpointOverride(),
+                SETPOINT_OVERRIDE,
+                now
+            )
+        )
+    }
+
+    private fun createRoom2Measurements(
+        statusDataValue: StatusData,
+        now: Instant
+    ): Set<Any> {
+        val room2 = "room2"
+        return setOf(
+            Temperature(
+                lan2RFConfiguration.source,
+                room2,
+                statusDataValue.room2Temperature(),
+                RECORDED,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                room2,
+                statusDataValue.room2TemperatureSetpoint(),
+                SETPOINT,
+                now
+            ),
+            Temperature(
+                lan2RFConfiguration.source,
+                room2,
+                statusDataValue.room2TemperatureSetpointOverride(),
+                SETPOINT_OVERRIDE,
+                now
+            )
+        )
     }
 
     companion object {

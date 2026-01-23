@@ -22,14 +22,26 @@ class LAN2RFConfiguration {
 
     var checkInterval: Duration = DEFAULT_CHECK_INTERVAL
 
+    var measurements = Measurements()
+
+    @ConfigurationProperties("measurements")
+    data class Measurements(
+        var boiler: Boolean = true,
+        var room1: Boolean = true,
+        var room2: Boolean = true
+    )
+
     @PostConstruct
     fun logConfiguration() {
         LOGGER.info(
-            "LAN2RF Configuration: source='{}', room1Name='{}', room2Name='{}', checkInterval='{}'",
+            "LAN2RF Configuration: source='{}', room1Name='{}', room2Name='{}', checkInterval='{}', measurements.boiler='{}', measurements.room1='{}', measurements.room2='{}'",
             source,
             room1Name,
             room2Name,
-            checkInterval
+            checkInterval,
+            measurements.boiler,
+            measurements.room1,
+            measurements.room2
         )
     }
 

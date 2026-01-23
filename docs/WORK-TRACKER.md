@@ -1,4 +1,17 @@
-# TASKS
+# Work Tracker
+
+This file tracks DONE, DOING and BACKLOG items.
+
+It provides a high level of detail for each item only. For more detail see [docs/features](docs/features).
+
+# DOING
+
+# Unprioritised Backlog / Ideas
+
+* Would it be sensible to align data sending to an exact minute (and 0 seconds)?
+**Note:** Do not upgrade to jvm-test-suite plugin yet. It's in incubating and doesn't work very well! When we tried to use it IntelliJ was unable to resolve classpath dependencies
+
+# DONE
 
 1. ~~Implement something that sends the status data to InfluxDB~~
 2. ~~Implement something which periodically obtains the LAN2RF data.~~
@@ -12,23 +25,13 @@
 10. ~~On startup, log the configured check interval.~~
 11. ~~Set default room names to more sensible defaults.~~
 12. ~~Add a DEBUG level log in StatusDataPublisher, logging the data that is sent to InfluxDB.~~
-12. Get the README uploading to Docker hub
-13. Write and publish a blog post about this project
-14. Support consumption of data from LAN2RF devices which have basic auth enabled
-15. Identify areas where tests are missing and write them
-16. ~~Build the app as a Docker image and test that it works~~
-17. Can the built Docker image be tested conveniently as a Gradle task? What did I do for influxdb-weather-ingestor?
-18. ~~Make native image work on Fitlet~~
+13. ~~Get the README uploading to Docker hub~~
+14. Write and publish a blog post about this project
+15. Support consumption of data from LAN2RF devices which have basic auth enabled
+16. Identify areas where tests are missing and write them
+17. ~~Build the app as a Docker image and test that it works~~
+18. Can the built Docker image be tested conveniently as a Gradle task? What did I do for influxdb-weather-ingestor?
+19. ~~Make native image work on Fitlet~~
     ~~> The current machine does not support all of the following CPU features that are required by the image: [CX8, CMOV, FXSR, MMX, SSE, SSE2, SSE3, SSSE3, SSE4_1, SSE4_2, POPCNT, LZCNT, AVX, AVX2, BMI1, BMI2, FMA].~~
-19. ~~Figure out why InfluxDB client thinks there's no data when run as a virtual image:~~
-
-**Note:** Do not upgrade to jvm-test-suite plugin yet. It's in incubating and doesn't work very well! When we tried to use it IntelliJ was unable to resolve classpath dependencies
-
-# Decisions
-
-## InfluxDB Data Design
-
-### Options
-
-1. A single measurement, perhaps "status" or "lan2rf"
-2. Separate measurements: Pressure, Temperature, Status etc
+20. ~~Figure out why InfluxDB client thinks there's no data when run as a virtual image:~~
+21. ~~Make it possible to disable sending of different measurements, to save data.~~
