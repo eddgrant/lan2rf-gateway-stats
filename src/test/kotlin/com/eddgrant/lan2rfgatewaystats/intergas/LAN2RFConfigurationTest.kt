@@ -22,4 +22,10 @@ class LAN2RFConfigurationTest : StringSpec({
     "The default room2 name is used" {
         lan2rfConfiguration.room2Name.shouldBe(LAN2RFConfiguration.ROOM_2_DEFAULT_NAME)
     }
+
+    "The default measurements are enabled" {
+        lan2rfConfiguration.measurements.boiler.shouldBe(true)
+        lan2rfConfiguration.measurements.room1.shouldBe(true)
+        lan2rfConfiguration.measurements.room2.shouldBe(true)
+    }
 })

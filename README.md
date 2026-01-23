@@ -59,7 +59,7 @@ lan2rf-gateway-stats should start and begin to log its output to the console:
 | |\/| | |/ __| '__/ _ \| '_ \ / _` | | | | __|
 | |  | | | (__| | | (_) | | | | (_| | |_| | |_ 
 |_|  |_|_|\___|_|  \___/|_| |_|\__,_|\__,_|\__|
-18:54:27.573 [main] INFO  c.e.l.intergas.LAN2RFConfiguration - LAN2RF Configuration: source='lan2rf', room1Name='room1', room2Name='room2', checkInterval='PT30S'
+18:54:27.573 [main] INFO  c.e.l.intergas.LAN2RFConfiguration - LAN2RF Configuration: source='lan2rf', room1Name='room1', room2Name='room2', checkInterval='PT30S', measurements.boiler='true', measurements.room1='true', measurements.room2='true'
 18:54:27.578 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'com'
 18:54:27.579 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'INFO' for logger: 'com.eddgrant'
 18:54:27.580 [main] INFO  i.m.l.PropertiesLoggingLevelsConfigurer - Setting log level 'ERROR' for logger: 'io'
@@ -88,6 +88,29 @@ Each time the status data is sent to InfluxDB an `INFO` level log entry is writt
 
 ```shell
 19:00:25.478 [DefaultDispatcher-worker-1] INFO  c.e.l.p.influxdb.StatusDataPublisher - Status Data measurements sent at: 2025-11-04T19:00:25.443115704Z
+```
+
+## Measurement Configuration
+
+By default, all measurements are published to InfluxDB. You can disable certain groups of measurements by setting the following environment variables to `false`:
+
+- `LAN2RF_MEASUREMENTS_BOILER`: Disable all boiler-related measurements.
+- `LAN2RF_MEASUREMENTS_ROOM1`: Disable all Room 1 measurements.
+- `LAN2RF_MEASUREMENTS_ROOM2`: Disable all Room 2 measurements.
+
+For example, to disable Room 2 measurements, you would run the following command:
+
+```shell
+docker run --rm \
+  --net=lan2rf-gateway-stats \
+  --env LAN2RF_MEASUREMENTS_ROOM2=false \
+  --env LAN2RF_CHECK_INTERVAL=30s \
+  --env LAN2RF_URL="http://192.168.2.58" \
+  --env INFLUXDB_ORG="my-influxdb-org" \
+  --env INFLUXDB_BUCKET="intergas" \
+  --env INFLUXDB_TOKEN="my-very-secure-influxdb-token" \
+  --env INFLUXDB_URL="http://influxdb:8086?connectTimeout=5S&readTimeout=5S&writeTimeout=5S" \
+    eddgrant/lan2rf-gateway-stats:local
 ```
 
 ## The Data
@@ -197,7 +220,13 @@ from(bucket: "intergas")
 
 ## Debugging
 
-If you want to see what data is being sent to InfluxDB, without having to query InfluxDB itself. You can configure `DEBUG` level logging on the `StatusDataPublisher` class logger. This will emit a log entry containing the measurement data, each time it is sent to InfluxDB e.g.
+If you want to see what data is being sent to InfluxDB, without having to query InfluxDB itself. You can configure `DEBUG` level logging on the `StatusDataPublisher` logger. This can be done by adding the following environment variable to the Docker run command:
+
+```bash
+--env LOGGER_LEVELS_COM_EDDGRANT_LAN2RFGATEWAYSTATS_PERSISTENCE_INFLUXDB_StatusDataPublisher=DEBUG
+```
+
+This will emit a log entry containing the measurement data, each time it is sent to InfluxDB e.g.
 
 ```shell
 19:29:40.034 [DefaultDispatcher-worker-1] DEBUG c.e.l.p.influxdb.StatusDataPublisher - Measurements: [
