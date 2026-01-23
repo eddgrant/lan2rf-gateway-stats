@@ -197,7 +197,13 @@ from(bucket: "intergas")
 
 ## Debugging
 
-If you want to see what data is being sent to InfluxDB, without having to query InfluxDB itself. You can configure `DEBUG` level logging on the `StatusDataPublisher` class logger. This will emit a log entry containing the measurement data, each time it is sent to InfluxDB e.g.
+If you want to see what data is being sent to InfluxDB, without having to query InfluxDB itself. You can configure `DEBUG` level logging on the `StatusDataPublisher` logger. This can be done by adding the following environment variable to the Docker run command:
+
+```bash
+--env LOGGER_LEVELS_COM_EDDGRANT_LAN2RFGATEWAYSTATS_PERSISTENCE_INFLUXDB_StatusDataPublisher=DEBUG
+```
+
+This will emit a log entry containing the measurement data, each time it is sent to InfluxDB e.g.
 
 ```shell
 19:29:40.034 [DefaultDispatcher-worker-1] DEBUG c.e.l.p.influxdb.StatusDataPublisher - Measurements: [
