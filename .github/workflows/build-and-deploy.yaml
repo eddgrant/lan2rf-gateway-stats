@@ -81,7 +81,7 @@ jobs:
         run:  echo ${{ secrets.docker_hub_password }} | docker login --username ${{ secrets.docker_hub_username }} --password-stdin registry.hub.docker.com/library/eddgrant/lan2rf-stats-gateway
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       # Note: We skip unit and integration tests as we're already run them above.
       - name: Build with Gradle
