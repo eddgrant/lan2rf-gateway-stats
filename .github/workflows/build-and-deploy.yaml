@@ -62,7 +62,7 @@ jobs:
         run:  echo ${{ secrets.docker_hub_password }} | docker login --username ${{ secrets.docker_hub_username }} --password-stdin registry.hub.docker.com/library/eddgrant/lan2rf-stats-gateway
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run Unit Tests
         run: ./gradlew test
