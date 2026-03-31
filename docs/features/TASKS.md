@@ -15,7 +15,7 @@
 - **Fix:** Replace the hardcoded strings with `lan2RFConfiguration.room1Name` and `lan2RFConfiguration.room2Name`.
 
 ### 3. Clean up Reactor-coroutine bridge
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `StatusDataPublisher.kt:34-53`
 - **Problem:** The hand-rolled `Mono.create` + `CoroutineScope(Dispatchers.IO).launch` bridge creates a new unstructured coroutine scope per emission with no supervision. This is fragile and hard to reason about.
 - **Fix:** Use `kotlinx-coroutines-reactor` which provides `mono {}` and `flux {}` coroutine builders that integrate properly with Reactor's lifecycle, cancellation, and error propagation.
