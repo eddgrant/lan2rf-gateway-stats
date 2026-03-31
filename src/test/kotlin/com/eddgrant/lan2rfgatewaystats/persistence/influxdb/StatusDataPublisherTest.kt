@@ -94,8 +94,9 @@ class StatusDataPublisherTest : FunSpec({
         comparableCaptured shouldContainExactlyInAnyOrder comparableExpected
     }
 
-    test("Failure to write measurements to InfluxDB is propagated back to the caller") {
+    test("Failure to write measurements to InfluxDB is logged and the stream continues") {
         // Given
+        every { lan2RFConfiguration.measurements } returns LAN2RFConfiguration.Measurements()
         val statusData = StatusDataTestFixtures.BASIC
         val statusDataFlux = Flux.just(statusData)
 
@@ -107,8 +108,28 @@ class StatusDataPublisherTest : FunSpec({
 
         // Then
         StepVerifier.create(result)
-            .expectError(RuntimeException::class.java)
-            .verify()
+            .verifyComplete()
+    }
+
+    test("Stream continues processing after an InfluxDB write failure") {
+        // Given
+        every { lan2RFConfiguration.measurements } returns LAN2RFConfiguration.Measurements()
+        val statusData = StatusDataTestFixtures.BASIC
+        val statusDataFlux = Flux.just(statusData, statusData)
+
+        every { influxDBClientKotlin.getWriteKotlinApi() } returns writeApi
+        coEvery { writeApi.writeMeasurements(any<Set<Any>>(), any<WritePrecision>()) } throws RuntimeException("Write failed") andThen Unit
+
+        // When
+        val result = underTest.publishAsDiscreteMeasurements(statusDataFlux)
+
+        // Then
+        StepVerifier.create(result)
+            .verifyComplete()
+
+        coVerify(exactly = 2) {
+            writeApi.writeMeasurements(any<Set<Any>>(), WritePrecision.MS)
+        }
     }
 
 })

@@ -51,6 +51,10 @@ class StatusDataPublisher(
                     }
                     sink.onDispose { job.cancel() }
                 }
+                .onErrorResume { e ->
+                    LOGGER.error("Failed to write measurements to InfluxDB. Will retry on next interval.", e)
+                    Mono.empty()
+                }
             }
     }
 
