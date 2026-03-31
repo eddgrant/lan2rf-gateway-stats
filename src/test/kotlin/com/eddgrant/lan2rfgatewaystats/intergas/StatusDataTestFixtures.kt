@@ -15,7 +15,7 @@ class StatusDataTestFixtures {
             room1TemperatureSetpointMsb = 7,
             room1TemperatureSetpointLsb = 208,
             room2TemperatureMsb = 8,
-            room2Temperaturelsb = 102,
+            room2TemperatureLsb = 102,
             room2TemperatureSetpointMsb = 7,
             room2TemperatureSetpointLsb = 8,
             statusDisplayCode = 231,

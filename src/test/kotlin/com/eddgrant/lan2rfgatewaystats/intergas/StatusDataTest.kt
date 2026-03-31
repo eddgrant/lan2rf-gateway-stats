@@ -173,7 +173,7 @@ class StatusDataTest(
         serialisedStatusData.room1TemperatureMsb shouldBe 7
         serialisedStatusData.room1TemperatureLsb shouldBe 208
         serialisedStatusData.room1TemperatureSetpointMsb shouldBe 7
-        serialisedStatusData.room2Temperaturelsb shouldBe 255
+        serialisedStatusData.room2TemperatureLsb shouldBe 255
         serialisedStatusData.room2TemperatureMsb shouldBe 127
         serialisedStatusData.room2TemperatureSetpointLsb shouldBe 255
         serialisedStatusData.room2TemperatureSetpointMsb shouldBe 127
