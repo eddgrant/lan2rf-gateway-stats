@@ -114,7 +114,7 @@ class StatusDataPublisher(
         statusDataValue: StatusData,
         now: Instant
     ): Set<Any> {
-        val room1 = "room1"
+        val room1 = lan2RFConfiguration.room1Name
         return setOf(
             Temperature(
                 lan2RFConfiguration.source,
@@ -144,7 +144,7 @@ class StatusDataPublisher(
         statusDataValue: StatusData,
         now: Instant
     ): Set<Any> {
-        val room2 = "room2"
+        val room2 = lan2RFConfiguration.room2Name
         return setOf(
             Temperature(
                 lan2RFConfiguration.source,
