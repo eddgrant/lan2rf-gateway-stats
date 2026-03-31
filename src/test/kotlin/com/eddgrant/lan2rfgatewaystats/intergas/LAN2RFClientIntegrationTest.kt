@@ -10,16 +10,62 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.micronaut.serde.ObjectMapper
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
 
 @MicronautTest
 class LAN2RFClientIntegrationTest(
     private val objectMapper: ObjectMapper,
     private val client: LAN2RFClient
-) : StringSpec(), TestPropertyProvider {
+) : StringSpec({
 
+    afterSpec {
+        wireMockServer.stop()
+    }
+
+    "it retrieves and deserialises status data from the LAN2RF device" {
+        wireMockServer.stubFor(
+            get(urlEqualTo("/data.json"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBody(STATUS_DATA_JSON)
+                )
+        )
+
+        val httpResponse = client.getStatusData().block()!!
+
+        httpResponse.status.code shouldBe 200
+        val statusDataString = httpResponse.body()
+        val statusData = objectMapper.readValue(statusDataString, StatusData::class.java)
+        statusData shouldNotBe null
+        statusData.centralHeatingTemperatureMsb shouldBe 32
+        statusData.centralHeatingTemperatureLsb shouldBe 124
+        statusData.nodenr shouldBe 200
+    }
+
+    "it handles a response with no Content-Type header" {
+        wireMockServer.stubFor(
+            get(urlEqualTo("/data.json"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBody(STATUS_DATA_JSON)
+                )
+        )
+
+        val httpResponse = client.getStatusData().block()!!
+
+        httpResponse.status.code shouldBe 200
+        val statusData = objectMapper.readValue(httpResponse.body(), StatusData::class.java)
+        statusData shouldNotBe null
+    }
+}) {
     companion object {
         val wireMockServer = WireMockServer(wireMockConfig().dynamicPort()).apply { start() }
+
+        init {
+            // Set before Micronaut context creation so the LAN2RF URL placeholder resolves
+            System.setProperty("LAN2RF_URL", wireMockServer.baseUrl())
+        }
 
         val STATUS_DATA_JSON = """
             {
@@ -54,53 +100,5 @@ class LAN2RFClientIntegrationTest(
                 "rfstatus_cntr": 0
             }
         """.trimIndent()
-    }
-
-    override fun getProperties(): Map<String, String> = mapOf(
-        "micronaut.http.services.lan2rf.urls[0]" to "http://localhost:${wireMockServer.port()}"
-    )
-
-    init {
-        afterSpec {
-            wireMockServer.stop()
-        }
-
-        "it retrieves and deserialises status data from the LAN2RF device" {
-            wireMockServer.stubFor(
-                get(urlEqualTo("/data.json"))
-                    .willReturn(
-                        aResponse()
-                            .withStatus(200)
-                            .withBody(STATUS_DATA_JSON)
-                    )
-            )
-
-            val httpResponse = client.getStatusData().block()!!
-
-            httpResponse.status.code shouldBe 200
-            val statusDataString = httpResponse.body()
-            val statusData = objectMapper.readValue(statusDataString, StatusData::class.java)
-            statusData shouldNotBe null
-            statusData.centralHeatingTemperatureMsb shouldBe 32
-            statusData.centralHeatingTemperatureLsb shouldBe 124
-            statusData.nodenr shouldBe 200
-        }
-
-        "it handles a response with no Content-Type header" {
-            wireMockServer.stubFor(
-                get(urlEqualTo("/data.json"))
-                    .willReturn(
-                        aResponse()
-                            .withStatus(200)
-                            .withBody(STATUS_DATA_JSON)
-                    )
-            )
-
-            val httpResponse = client.getStatusData().block()!!
-
-            httpResponse.status.code shouldBe 200
-            val statusData = objectMapper.readValue(httpResponse.body(), StatusData::class.java)
-            statusData shouldNotBe null
-        }
     }
 }

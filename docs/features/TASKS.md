@@ -65,7 +65,7 @@
 - **Fix:** Delete the file.
 
 ### 11. Reclassify LAN2RFClientIntegrationTest
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `LAN2RFClientIntegrationTest.kt`
 - **Problem:** This integration test targets a physical device at a hardcoded IP (`192.168.2.58`). It can only pass on the developer's home network, meaning CI can never run it.
 - **Fix:** Move to the `endToEndTest` source set (where device-dependent tests belong), or introduce WireMock to simulate the LAN2RF device for a true integration test.
