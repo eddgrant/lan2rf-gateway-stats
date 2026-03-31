@@ -10,4 +10,4 @@ data class Pressure(
     @Column(tag = true) val subject: String,
     @Column val value: Double,
     @Column(timestamp = true) val time: Instant,
-)
+) : InfluxDBMeasurement

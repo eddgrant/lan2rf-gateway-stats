@@ -53,7 +53,7 @@ class StatusDataPublisher(
     private fun asMeasurements(
         statusData: StatusData,
         now: Instant
-    ): Set<Any> {
+    ): Set<InfluxDBMeasurement> {
         return buildSet {
             if (lan2RFConfiguration.measurements.boiler) {
                 addAll(createBoilerMeasurements(statusData, now))
@@ -72,7 +72,7 @@ class StatusDataPublisher(
     private fun createBoilerMeasurements(
         statusDataValue: StatusData,
         now: Instant
-    ): Set<Any> {
+    ): Set<InfluxDBMeasurement> {
         return setOf(
             Temperature(
                 lan2RFConfiguration.source,
@@ -105,7 +105,7 @@ class StatusDataPublisher(
     private fun createRoom1Measurements(
         statusDataValue: StatusData,
         now: Instant
-    ): Set<Any> {
+    ): Set<InfluxDBMeasurement> {
         val room1 = lan2RFConfiguration.room1Name
         return setOf(
             Temperature(
@@ -135,7 +135,7 @@ class StatusDataPublisher(
     private fun createRoom2Measurements(
         statusDataValue: StatusData,
         now: Instant
-    ): Set<Any> {
+    ): Set<InfluxDBMeasurement> {
         val room2 = lan2RFConfiguration.room2Name
         return setOf(
             Temperature(

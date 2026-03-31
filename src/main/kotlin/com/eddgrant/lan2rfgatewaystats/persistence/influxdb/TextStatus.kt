@@ -10,4 +10,4 @@ data class TextStatus(
     @Column(tag = true) val subject: String,
     @Column val value: String,
     @Column(timestamp = true) val time: Instant,
-)
+) : InfluxDBMeasurement
