@@ -56,7 +56,7 @@ dependencies {
 
     testImplementation("org.testcontainers:influxdb:1.21.4")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.wiremock:wiremock-standalone:3.13.0")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
     implementation("io.micronaut.validation:micronaut-validation")
