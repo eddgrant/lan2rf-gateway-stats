@@ -36,7 +36,7 @@
 ## Priority 3 (Low)
 
 ### 6. Fix inconsistent camelCase in StatusData
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `StatusData.kt:24`
 - **Problem:** `room2Temperaturelsb` (lowercase 'l') vs `room2TemperatureLsb` used everywhere else. Minor naming inconsistency.
 - **Fix:** Rename to `room2TemperatureLsb`. The `@param:JsonProperty` annotation means the JSON mapping is unaffected.
@@ -47,19 +47,19 @@
 - **Fix:** Migrate remaining JUnit assertions (primarily in `StatusDataTest`) to Kotest matchers.
 
 ### 8. Remove or populate empty InfluxDBServiceTest
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `InfluxDBServiceTest.kt`
 - **Problem:** The test file exists but contains no tests. Gives a false impression of coverage.
 - **Fix:** Either add meaningful tests or delete the file.
 
 ### 9. Remove unnecessary @Inject annotations from IntergasService
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `IntergasService.kt:10-11`
 - **Problem:** Both constructor parameters use `@Inject` despite AGENTS.md stating: "Don't use `@Inject` on constructors if it's the only one." Micronaut handles single-constructor injection automatically.
 - **Fix:** Remove the `@Inject` annotations.
 
 ### 10. Remove unused log4j2.xml
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `src/main/resources/log4j2.xml`
 - **Problem:** The project uses Logback. The log4j2.xml file is dead configuration that could confuse contributors.
 - **Fix:** Delete the file.
