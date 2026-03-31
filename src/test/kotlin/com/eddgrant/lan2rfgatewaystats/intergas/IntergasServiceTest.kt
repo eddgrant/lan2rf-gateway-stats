@@ -12,7 +12,6 @@ import io.micronaut.test.extensions.kotest5.MicronautKotest5Extension.getMock
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
 import reactor.core.publisher.Mono
 
 @MicronautTest(environments = ["lan2rf-integration-test"])
@@ -68,7 +67,7 @@ class IntergasServiceTest(
         val statusData = intergasService.getStatusData().block()!!
 
         // Then
-        assertEquals(statusData, objectMapper.readValue(statusDataJsonString, StatusData::class.java))
+        statusData shouldBe objectMapper.readValue(statusDataJsonString, StatusData::class.java)
     }
 
     "it raises an exception when it cannot parse the status data object" {
