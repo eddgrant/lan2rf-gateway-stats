@@ -3,7 +3,7 @@
 ## Priority 1 (High)
 
 ### 1. Fix InfluxDB write error resilience
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `StatusDataPublisher.kt:48-50`
 - **Problem:** When an InfluxDB write fails, the error propagates via `sink.error(e)`, terminating the entire reactive subscription. The application continues running but stops collecting and publishing data -- effectively a zombie process requiring a restart.
 - **Fix:** Add error recovery (e.g. `onErrorResume`) so that a transient InfluxDB failure is logged and skipped, matching the existing HTTP error handling pattern in `LAN2RFRepository`.
