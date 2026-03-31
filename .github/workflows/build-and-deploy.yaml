@@ -14,8 +14,9 @@ on:
         required: true
 
 concurrency:
-  # Limit to a single concurrent invocation to ensure tagging works correctly.
-  group: lan2rf-stats-gateway
+  # Scoped per-workflow and ref. Version collision safety is handled by the caller
+  # workflows (main.yaml, pr.yaml) which each have their own concurrency groups.
+  group: lan2rf-stats-gateway-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -23,9 +24,6 @@ env:
   version_format: ${{ github.event_name == 'pull_request' && format('${{major}}.${{minor}}.${{patch}}-pr.{0}-{1}', github.event.number, github.sha) || '${major}.${minor}.${patch}' }}
 
 jobs:
-  unit-tests:
-    uses: ./.github/workflows/unit-tests.yaml
-
   #integration-tests:
   #  uses: ./.github/workflows/integration-tests.yaml
 
@@ -34,27 +32,10 @@ jobs:
       actions: read
       checks: write
       contents: write
-    needs:
-      - unit-tests
+    #needs:
       #- integration-tests
     runs-on: ubuntu-latest
     steps:
-      # Try updating to latest version of Docker to resolve 'Could not push image: missing content-length header for request:' issue.
-      # https://forums.docker.com/t/unexpected-missing-content-length-header-for-request/145907/12
-      - name: Check Docker Version
-        run: docker --version
-
-      - name: Install Latest Docker
-        run: |
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-          sudo apt-get update
-          sudo apt-get install docker-ce
-          sudo systemctl restart docker
-
-      - name: Check Docker Version
-        run: docker --version
-
       - name: Checkout sources
         uses: actions/checkout@v5
         with:
@@ -83,7 +64,24 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      # Note: We skip unit and integration tests as we're already run them above.
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Upload test results artefacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: build/test-results/test
+
+      - name: Publish Unit Test Report
+        if: success() || failure()
+        uses: dorny/test-reporter@v2
+        with:
+          name: Unit Test Report
+          path: build/test-results/test/*.xml
+          reporter: java-junit
+
       - name: Build with Gradle
         run: ./gradlew --exclude-task test --exclude-task check -Pversion="${{ steps.semver.outputs.version }}" ${{ inputs.gradle_tasks }}
 
