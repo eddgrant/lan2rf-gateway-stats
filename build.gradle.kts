@@ -50,6 +50,7 @@ dependencies {
     ksp("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
 
+    implementation("io.micronaut:micronaut-management")
     implementation("com.influxdb:influxdb-client-kotlin:7.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
