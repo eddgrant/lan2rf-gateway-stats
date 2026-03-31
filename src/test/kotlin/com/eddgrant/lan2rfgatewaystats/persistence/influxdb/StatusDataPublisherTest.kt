@@ -49,7 +49,7 @@ class StatusDataPublisherTest : FunSpec({
         StepVerifier.create(result)
             .verifyComplete()
 
-        val measurementsSlot = slot<Set<Any>>()
+        val measurementsSlot = slot<Set<InfluxDBMeasurement>>()
         coVerify(exactly = 1) {
             writeApi.writeMeasurements(capture(measurementsSlot), WritePrecision.MS)
         }
@@ -81,7 +81,7 @@ class StatusDataPublisherTest : FunSpec({
         StepVerifier.create(result)
             .verifyComplete()
 
-        val measurementsSlot = slot<Set<Any>>()
+        val measurementsSlot = slot<Set<InfluxDBMeasurement>>()
         coVerify(exactly = 1) {
             writeApi.writeMeasurements(capture(measurementsSlot), WritePrecision.MS)
         }
@@ -113,7 +113,7 @@ class StatusDataPublisherTest : FunSpec({
         StepVerifier.create(result)
             .verifyComplete()
 
-        val measurementsSlot = slot<Set<Any>>()
+        val measurementsSlot = slot<Set<InfluxDBMeasurement>>()
         coVerify(exactly = 1) {
             writeApi.writeMeasurements(capture(measurementsSlot), WritePrecision.MS)
         }
@@ -137,7 +137,7 @@ class StatusDataPublisherTest : FunSpec({
         val statusDataFlux = Flux.just(statusData)
 
         every { influxDBClientKotlin.getWriteKotlinApi() } returns writeApi
-        coEvery { writeApi.writeMeasurements(any<Set<Any>>(), any<WritePrecision>()) } throws RuntimeException("Write failed")
+        coEvery { writeApi.writeMeasurements(any<Set<InfluxDBMeasurement>>(), any<WritePrecision>()) } throws RuntimeException("Write failed")
 
         // When
         val result = underTest.publishAsDiscreteMeasurements(statusDataFlux)
@@ -154,7 +154,7 @@ class StatusDataPublisherTest : FunSpec({
         val statusDataFlux = Flux.just(statusData, statusData)
 
         every { influxDBClientKotlin.getWriteKotlinApi() } returns writeApi
-        coEvery { writeApi.writeMeasurements(any<Set<Any>>(), any<WritePrecision>()) } throws RuntimeException("Write failed") andThen Unit
+        coEvery { writeApi.writeMeasurements(any<Set<InfluxDBMeasurement>>(), any<WritePrecision>()) } throws RuntimeException("Write failed") andThen Unit
 
         // When
         val result = underTest.publishAsDiscreteMeasurements(statusDataFlux)
@@ -164,13 +164,13 @@ class StatusDataPublisherTest : FunSpec({
             .verifyComplete()
 
         coVerify(exactly = 2) {
-            writeApi.writeMeasurements(any<Set<Any>>(), WritePrecision.MS)
+            writeApi.writeMeasurements(any<Set<InfluxDBMeasurement>>(), WritePrecision.MS)
         }
     }
 
 })
 
-private fun buildExpectedBoilerMeasurements(statusData: StatusData, source: String): Set<Any> {
+private fun buildExpectedBoilerMeasurements(statusData: StatusData, source: String): Set<InfluxDBMeasurement> {
     val now = Instant.now() // Ignored in comparison
     return setOf(
         Temperature(source, "central_heating", statusData.centralHeatingTemperature(), Temperature.Type.RECORDED, now),
@@ -187,7 +187,7 @@ private fun buildExpectedBoilerMeasurements(statusData: StatusData, source: Stri
     )
 }
 
-private fun buildExpectedRoom1Measurements(statusData: StatusData, source: String, roomName: String = "room1"): Set<Any> {
+private fun buildExpectedRoom1Measurements(statusData: StatusData, source: String, roomName: String = "room1"): Set<InfluxDBMeasurement> {
     val now = Instant.now() // Ignored in comparison
     return setOf(
         Temperature(source, roomName, statusData.room1Temperature(), Temperature.Type.RECORDED, now),
@@ -196,7 +196,7 @@ private fun buildExpectedRoom1Measurements(statusData: StatusData, source: Strin
     )
 }
 
-private fun buildExpectedRoom2Measurements(statusData: StatusData, source: String, roomName: String = "room2"): Set<Any> {
+private fun buildExpectedRoom2Measurements(statusData: StatusData, source: String, roomName: String = "room2"): Set<InfluxDBMeasurement> {
     val now = Instant.now() // Ignored in comparison
     return setOf(
         Temperature(source, roomName, statusData.room2Temperature(), Temperature.Type.RECORDED, now),
@@ -206,13 +206,12 @@ private fun buildExpectedRoom2Measurements(statusData: StatusData, source: Strin
 }
 
 
-private fun Any.toComparable(): Any {
+private fun InfluxDBMeasurement.toComparable(): InfluxDBMeasurement {
     val fixedTime = Instant.EPOCH
     return when (this) {
         is Temperature -> this.copy(time = fixedTime)
         is Pressure -> this.copy(time = fixedTime)
         is TextStatus -> this.copy(time = fixedTime)
         is OperationalStatus -> this.copy(time = fixedTime)
-        else -> this
     }
 }
