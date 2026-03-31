@@ -126,10 +126,14 @@ tasks.named<MicronautDockerfile>("dockerfile") {
     baseImage.set("eclipse-temurin:${org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21.target}-jre")
 }
 
+val testSourceSet = sourceSets["test"]
+
 val integrationTestTask = tasks.register<Test>("integrationTest") {
     description = "Runs integration tests."
     group = "verification"
     useJUnitPlatform()
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     filter {
         includeTestsMatching("*Integration*")
     }
@@ -140,6 +144,8 @@ val endToEndTestTask = tasks.register<Test>("endToEndTest") {
     description = "Runs End to End tests. For manual invocation only, not included in the check task"
     group = "verification"
     useJUnitPlatform()
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     filter {
         includeTestsMatching("*EndToEnd*")
     }
