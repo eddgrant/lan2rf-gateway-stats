@@ -15,6 +15,11 @@ micronaut:
       max-order: 3
 
 
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
+
 logger:
   levels:
     com.eddgrant: INFO

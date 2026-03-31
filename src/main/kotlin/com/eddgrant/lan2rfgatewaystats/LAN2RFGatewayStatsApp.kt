@@ -27,10 +27,13 @@ class LAN2RFGatewayStatsApp(
         LOGGER.info("Subscription to LAN2RF data created.")
     }
 
+    fun isSubscriptionActive(): Boolean =
+        this::disposable.isInitialized && !disposable.isDisposed
+
     @PreDestroy
     fun stop() {
         LOGGER.info("Shutdown signal received: Cancelling subscription to LAN2RF data.")
-        if (this::disposable.isInitialized && !disposable.isDisposed) {
+        if (isSubscriptionActive()) {
             disposable.dispose()
         }
     }
