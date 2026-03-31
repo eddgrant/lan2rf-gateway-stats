@@ -21,7 +21,7 @@ data class StatusData(
     @param:JsonProperty("room_temp_set_1_msb") internal val room1TemperatureSetpointMsb: Int,
     @param:JsonProperty("room_temp_set_1_lsb") internal val room1TemperatureSetpointLsb: Int,
     @param:JsonProperty("room_temp_2_msb") internal val room2TemperatureMsb: Int,
-    @param:JsonProperty("room_temp_2_lsb") internal val room2Temperaturelsb: Int,
+    @param:JsonProperty("room_temp_2_lsb") internal val room2TemperatureLsb: Int,
     @param:JsonProperty("room_temp_set_2_msb") internal val room2TemperatureSetpointMsb: Int,
     @param:JsonProperty("room_temp_set_2_lsb") internal val room2TemperatureSetpointLsb: Int,
     @param:JsonProperty("room_set_ovr_1_msb") internal val room1TemperatureSetpointOverrideMsb: Int,
@@ -46,7 +46,7 @@ data class StatusData(
     fun room1Temperature(): Double = combineMsbAndLsb(room1TemperatureMsb, room1TemperatureLsb)
     fun room1TemperatureSetpoint(): Double = combineMsbAndLsb(room1TemperatureSetpointMsb, room1TemperatureSetpointLsb)
     fun room1TemperatureSetpointOverride(): Double = combineMsbAndLsb(room1TemperatureSetpointOverrideMsb, room1TemperatureSetpointOverrideLsb)
-    fun room2Temperature(): Double = combineMsbAndLsb(room2TemperatureMsb, room2Temperaturelsb)
+    fun room2Temperature(): Double = combineMsbAndLsb(room2TemperatureMsb, room2TemperatureLsb)
     fun room2TemperatureSetpoint(): Double = combineMsbAndLsb(room2TemperatureSetpointMsb, room2TemperatureSetpointLsb)
     fun room2TemperatureSetpointOverride(): Double = combineMsbAndLsb(room2TemperatureSetpointOverrideMsb, room2TemperatureSetpointOverrideLsb)
     fun isLockedOut(): Boolean = isBitSet(io, IO_STATUS_BIT_LOCKED_OUT)
