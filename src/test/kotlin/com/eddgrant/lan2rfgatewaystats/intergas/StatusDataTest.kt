@@ -1,9 +1,10 @@
 package com.eddgrant.lan2rfgatewaystats.intergas
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.micronaut.serde.ObjectMapper
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.*
 
 @MicronautTest(environments = ["lan2rf-integration-test"])
 class StatusDataTest(
@@ -26,68 +27,68 @@ class StatusDataTest(
         .map { it.toInt(2) }
 
     "it calculates the central heating temperature" {
-        assertEquals(26.19, statusData.centralHeatingTemperature())
+        statusData.centralHeatingTemperature() shouldBe 26.19
         val msbAndLsb = convertTemperatureDoubleToMsbAndLsb(26.19)
-        assertEquals(10, msbAndLsb.first())
-        assertEquals(59, msbAndLsb.last())
+        msbAndLsb.first() shouldBe 10
+        msbAndLsb.last() shouldBe 59
     }
 
     "it calculates the tap temperature" {
-        assertEquals(27.76, statusData.tapTemperature())
+        statusData.tapTemperature() shouldBe 27.76
     }
 
     "it calculates the central heating pressure" {
-        assertEquals(1.56, statusData.centralHeatingPressure())
+        statusData.centralHeatingPressure() shouldBe 1.56
     }
 
     "it calculates room 1's temperature" {
-        assertEquals(19.50, statusData.room1Temperature())
+        statusData.room1Temperature() shouldBe 19.50
     }
 
     "it calculates room 1's temperature setpoint" {
-        assertEquals(20.0, statusData.room1TemperatureSetpoint())
+        statusData.room1TemperatureSetpoint() shouldBe 20.0
     }
 
     "it calculates room 1's temperature setpoint override" {
-        assertEquals(23.5, statusData.room1TemperatureSetpointOverride())
+        statusData.room1TemperatureSetpointOverride() shouldBe 23.5
     }
 
     "it calculates room 2's temperature" {
-        assertEquals(21.50, statusData.room2Temperature())
+        statusData.room2Temperature() shouldBe 21.50
     }
 
     "it calculates room 2's temperature setpoint" {
-        assertEquals(18.0, statusData.room2TemperatureSetpoint())
+        statusData.room2TemperatureSetpoint() shouldBe 18.0
     }
 
 
     "it calculates room 2's temperature setpoint override" {
-        assertEquals(25.5, statusData.room2TemperatureSetpointOverride())
+        statusData.room2TemperatureSetpointOverride() shouldBe 25.5
     }
 
     // IO tests
     "it determines when the the boiler is not in a locked out state" {
-        assertFalse(statusData.isLockedOut())
+        statusData.isLockedOut() shouldBe false
     }
 
     "it determines when the the boiler is in a locked out state" {
         val lockedOut = statusData.copy(io = 1)
-        assertTrue(lockedOut.isLockedOut())
+        lockedOut.isLockedOut() shouldBe true
     }
 
     "it determines when the the pump is active" {
         val pumpActive = statusData.copy(io = 2)
-        assertTrue(pumpActive.isPumpActive())
+        pumpActive.isPumpActive() shouldBe true
     }
 
     "it determines when the the tap function is active" {
         val tapFunctionActive = statusData.copy(io = 4)
-        assertTrue(tapFunctionActive.isTapFunctionActive())
+        tapFunctionActive.isTapFunctionActive() shouldBe true
     }
 
     "it determines when the the burner is active" {
         val burnerActive = statusData.copy(io = 8)
-        assertTrue(burnerActive.isBurnerActive())
+        burnerActive.isBurnerActive() shouldBe true
     }
 
     /**
@@ -97,29 +98,29 @@ class StatusDataTest(
      */
     "it determines when all IO are active" {
         val burnerActive = statusData.copy(io = 15)
-        assertTrue(burnerActive.isLockedOut())
-        assertTrue(burnerActive.isPumpActive())
-        assertTrue(burnerActive.isTapFunctionActive())
-        assertTrue(burnerActive.isBurnerActive())
+        burnerActive.isLockedOut() shouldBe true
+        burnerActive.isPumpActive() shouldBe true
+        burnerActive.isTapFunctionActive() shouldBe true
+        burnerActive.isBurnerActive() shouldBe true
     }
     // End of IO tests
 
     "it displays the correct status display code" {
-        assertEquals(statusData.copy(statusDisplayCode = 0).getStatusDisplayCode(), StatusData.STATUS_TEXT_OPEN_THERM)
-        assertEquals(statusData.copy(statusDisplayCode = 15).getStatusDisplayCode(), StatusData.STATUS_TEXT_BOILER_EXTERNAL)
-        assertEquals(statusData.copy(statusDisplayCode = 24).getStatusDisplayCode(), StatusData.STATUS_TEXT_FROST)
-        assertEquals(statusData.copy(statusDisplayCode = 37).getStatusDisplayCode(), StatusData.STATUS_TEXT_CENTRAL_HEATING_RF)
-        assertEquals(statusData.copy(statusDisplayCode = 51).getStatusDisplayCode(), StatusData.STATUS_TEXT_TAPWATER_INTERNAL)
-        assertEquals(statusData.copy(statusDisplayCode = 85).getStatusDisplayCode(), StatusData.STATUS_TEXT_SENSOR_TEST)
-        assertEquals(statusData.copy(statusDisplayCode = 102).getStatusDisplayCode(), StatusData.STATUS_TEXT_CENTRAL_HEATING)
-        assertEquals(statusData.copy(statusDisplayCode = 126).getStatusDisplayCode(), StatusData.STATUS_TEXT_STANDBY)
-        assertEquals(statusData.copy(statusDisplayCode = 153).getStatusDisplayCode(), StatusData.STATUS_TEXT_POSTRUN_BOILER)
-        assertEquals(statusData.copy(statusDisplayCode = 170).getStatusDisplayCode(), StatusData.STATUS_TEXT_SERVICE)
-        assertEquals(statusData.copy(statusDisplayCode = 204).getStatusDisplayCode(), StatusData.STATUS_TEXT_TAP_WATER)
-        assertEquals(statusData.copy(statusDisplayCode = 231).getStatusDisplayCode(), StatusData.STATUS_TEXT_POSTRUN_CENTRAL_HEATING)
-        assertEquals(statusData.copy(statusDisplayCode = 240).getStatusDisplayCode(), StatusData.STATUS_TEXT_BOILER_INTERNAL)
-        assertEquals(statusData.copy(statusDisplayCode = 255).getStatusDisplayCode(), StatusData.STATUS_TEXT_BUFFER)
-        assertEquals(statusData.copy(statusDisplayCode = 12345).getStatusDisplayCode(), "Unknown")
+        statusData.copy(statusDisplayCode = 0).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_OPEN_THERM
+        statusData.copy(statusDisplayCode = 15).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_BOILER_EXTERNAL
+        statusData.copy(statusDisplayCode = 24).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_FROST
+        statusData.copy(statusDisplayCode = 37).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_CENTRAL_HEATING_RF
+        statusData.copy(statusDisplayCode = 51).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_TAPWATER_INTERNAL
+        statusData.copy(statusDisplayCode = 85).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_SENSOR_TEST
+        statusData.copy(statusDisplayCode = 102).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_CENTRAL_HEATING
+        statusData.copy(statusDisplayCode = 126).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_STANDBY
+        statusData.copy(statusDisplayCode = 153).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_POSTRUN_BOILER
+        statusData.copy(statusDisplayCode = 170).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_SERVICE
+        statusData.copy(statusDisplayCode = 204).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_TAP_WATER
+        statusData.copy(statusDisplayCode = 231).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_POSTRUN_CENTRAL_HEATING
+        statusData.copy(statusDisplayCode = 240).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_BOILER_INTERNAL
+        statusData.copy(statusDisplayCode = 255).getStatusDisplayCode() shouldBe StatusData.STATUS_TEXT_BUFFER
+        statusData.copy(statusDisplayCode = 12345).getStatusDisplayCode() shouldBe "Unknown"
     }
 
     "it can serialise a JSON object from a JSON string" {
@@ -160,35 +161,35 @@ class StatusDataTest(
 
         val serialisedStatusData = objectMapper.readValue(jsonString, StatusData::class.java)
 
-        assertNotNull(serialisedStatusData)
-        assertEquals(200, serialisedStatusData.nodenr)
-        assertEquals(124, serialisedStatusData.centralHeatingTemperatureLsb)
-        assertEquals(32, serialisedStatusData.centralHeatingTemperatureMsb)
-        assertEquals(128, serialisedStatusData.tapTemperatureLsb)
-        assertEquals(19, serialisedStatusData.tapTemperatureMsb)
-        assertEquals(162, serialisedStatusData.centralHeatingPressureLsb)
-        assertEquals(0, serialisedStatusData.centralHeatingPressureMsb)
-        assertEquals(208, serialisedStatusData.room1TemperatureLsb)
-        assertEquals(7, serialisedStatusData.room1TemperatureMsb)
-        assertEquals(208, serialisedStatusData.room1TemperatureLsb)
-        assertEquals(7, serialisedStatusData.room1TemperatureSetpointMsb)
-        assertEquals(255, serialisedStatusData.room2Temperaturelsb)
-        assertEquals(127, serialisedStatusData.room2TemperatureMsb)
-        assertEquals(255, serialisedStatusData.room2TemperatureSetpointLsb)
-        assertEquals(127, serialisedStatusData.room2TemperatureSetpointMsb)
-        assertEquals(126, serialisedStatusData.statusDisplayCode)
-        assertEquals(0, serialisedStatusData.io)
-        assertEquals(18, serialisedStatusData.serialYear)
-        assertEquals(4, serialisedStatusData.serialMonth)
-        assertEquals(15, serialisedStatusData.serialLine)
-        assertEquals(0, serialisedStatusData.serialSn1)
-        assertEquals(70, serialisedStatusData.serialSn2)
-        assertEquals(63, serialisedStatusData.serialSn3)
-        assertEquals(0, serialisedStatusData.room1TemperatureSetpointOverrideMsb)
-        assertEquals(0, serialisedStatusData.room1TemperatureSetpointOverrideLsb)
-        assertEquals(0, serialisedStatusData.room2TemperatureSetpointOverrideMsb)
-        assertEquals(0, serialisedStatusData.room2TemperatureSetpointOverrideLsb)
-        assertEquals(31, serialisedStatusData.rfMessageRssi)
-        assertEquals(0, serialisedStatusData.rfstatusCntr)
+        serialisedStatusData shouldNotBe null
+        serialisedStatusData.nodenr shouldBe 200
+        serialisedStatusData.centralHeatingTemperatureLsb shouldBe 124
+        serialisedStatusData.centralHeatingTemperatureMsb shouldBe 32
+        serialisedStatusData.tapTemperatureLsb shouldBe 128
+        serialisedStatusData.tapTemperatureMsb shouldBe 19
+        serialisedStatusData.centralHeatingPressureLsb shouldBe 162
+        serialisedStatusData.centralHeatingPressureMsb shouldBe 0
+        serialisedStatusData.room1TemperatureLsb shouldBe 208
+        serialisedStatusData.room1TemperatureMsb shouldBe 7
+        serialisedStatusData.room1TemperatureLsb shouldBe 208
+        serialisedStatusData.room1TemperatureSetpointMsb shouldBe 7
+        serialisedStatusData.room2Temperaturelsb shouldBe 255
+        serialisedStatusData.room2TemperatureMsb shouldBe 127
+        serialisedStatusData.room2TemperatureSetpointLsb shouldBe 255
+        serialisedStatusData.room2TemperatureSetpointMsb shouldBe 127
+        serialisedStatusData.statusDisplayCode shouldBe 126
+        serialisedStatusData.io shouldBe 0
+        serialisedStatusData.serialYear shouldBe 18
+        serialisedStatusData.serialMonth shouldBe 4
+        serialisedStatusData.serialLine shouldBe 15
+        serialisedStatusData.serialSn1 shouldBe 0
+        serialisedStatusData.serialSn2 shouldBe 70
+        serialisedStatusData.serialSn3 shouldBe 63
+        serialisedStatusData.room1TemperatureSetpointOverrideMsb shouldBe 0
+        serialisedStatusData.room1TemperatureSetpointOverrideLsb shouldBe 0
+        serialisedStatusData.room2TemperatureSetpointOverrideMsb shouldBe 0
+        serialisedStatusData.room2TemperatureSetpointOverrideLsb shouldBe 0
+        serialisedStatusData.rfMessageRssi shouldBe 31
+        serialisedStatusData.rfstatusCntr shouldBe 0
     }
 })
