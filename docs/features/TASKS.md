@@ -23,7 +23,7 @@
 ## Priority 2 (Medium)
 
 ### 4. Add health check endpoint
-- **Status:** TODO
+- **Status:** DONE
 - **Problem:** The application has no HTTP endpoints. If the reactive subscription silently dies, no orchestrator (Docker, Kubernetes) can detect it. For a long-running IoT polling service, this is an operational gap.
 - **Fix:** Add Micronaut's `management` dependency for a `/health` endpoint. Consider a custom health indicator that checks whether the `Disposable` is still active and whether the last successful write was within a reasonable window.
 
