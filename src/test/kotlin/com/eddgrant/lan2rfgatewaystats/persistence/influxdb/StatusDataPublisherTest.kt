@@ -30,6 +30,8 @@ class StatusDataPublisherTest : FunSpec({
     beforeTest {
         clearMocks(influxDBClientKotlin, lan2RFConfiguration, writeApi)
         every { lan2RFConfiguration.source } returns "test-source"
+        every { lan2RFConfiguration.room1Name } returns "room1"
+        every { lan2RFConfiguration.room2Name } returns "room2"
     }
 
     test("Successfully writes all measurements to InfluxDB when all measurements are enabled") {
@@ -86,6 +88,40 @@ class StatusDataPublisherTest : FunSpec({
 
         val capturedMeasurements = measurementsSlot.captured
         val expectedMeasurements = buildExpectedBoilerMeasurements(statusData, lan2RFConfiguration.source)
+
+        capturedMeasurements shouldHaveSize expectedMeasurements.size
+
+        val comparableCaptured = capturedMeasurements.map { it.toComparable() }.toSet()
+        val comparableExpected = expectedMeasurements.map { it.toComparable() }.toSet()
+        comparableCaptured shouldContainExactlyInAnyOrder comparableExpected
+    }
+
+    test("Uses configured room names in measurements") {
+        // Given
+        every { lan2RFConfiguration.room1Name } returns "living_room"
+        every { lan2RFConfiguration.room2Name } returns "bedroom"
+        every { lan2RFConfiguration.measurements } returns LAN2RFConfiguration.Measurements(boiler = false, room1 = true, room2 = true)
+        val statusData = StatusDataTestFixtures.BASIC
+        val statusDataFlux = Flux.just(statusData)
+
+        every { influxDBClientKotlin.getWriteKotlinApi() } returns writeApi
+
+        // When
+        val result = underTest.publishAsDiscreteMeasurements(statusDataFlux)
+
+        // Then
+        StepVerifier.create(result)
+            .verifyComplete()
+
+        val measurementsSlot = slot<Set<Any>>()
+        coVerify(exactly = 1) {
+            writeApi.writeMeasurements(capture(measurementsSlot), WritePrecision.MS)
+        }
+
+        val capturedMeasurements = measurementsSlot.captured
+        val expectedMeasurements =
+            buildExpectedRoom1Measurements(statusData, lan2RFConfiguration.source, "living_room") +
+            buildExpectedRoom2Measurements(statusData, lan2RFConfiguration.source, "bedroom")
 
         capturedMeasurements shouldHaveSize expectedMeasurements.size
 
@@ -151,21 +187,21 @@ private fun buildExpectedBoilerMeasurements(statusData: StatusData, source: Stri
     )
 }
 
-private fun buildExpectedRoom1Measurements(statusData: StatusData, source: String): Set<Any> {
+private fun buildExpectedRoom1Measurements(statusData: StatusData, source: String, roomName: String = "room1"): Set<Any> {
     val now = Instant.now() // Ignored in comparison
     return setOf(
-        Temperature(source, "room1", statusData.room1Temperature(), Temperature.Type.RECORDED, now),
-        Temperature(source, "room1", statusData.room1TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
-        Temperature(source, "room1", statusData.room1TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now)
+        Temperature(source, roomName, statusData.room1Temperature(), Temperature.Type.RECORDED, now),
+        Temperature(source, roomName, statusData.room1TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
+        Temperature(source, roomName, statusData.room1TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now)
     )
 }
 
-private fun buildExpectedRoom2Measurements(statusData: StatusData, source: String): Set<Any> {
+private fun buildExpectedRoom2Measurements(statusData: StatusData, source: String, roomName: String = "room2"): Set<Any> {
     val now = Instant.now() // Ignored in comparison
     return setOf(
-        Temperature(source, "room2", statusData.room2Temperature(), Temperature.Type.RECORDED, now),
-        Temperature(source, "room2", statusData.room2TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
-        Temperature(source, "room2", statusData.room2TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now)
+        Temperature(source, roomName, statusData.room2Temperature(), Temperature.Type.RECORDED, now),
+        Temperature(source, roomName, statusData.room2TemperatureSetpoint(), Temperature.Type.SETPOINT, now),
+        Temperature(source, roomName, statusData.room2TemperatureSetpointOverride(), Temperature.Type.SETPOINT_OVERRIDE, now)
     )
 }
 

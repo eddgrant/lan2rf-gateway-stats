@@ -9,7 +9,7 @@
 - **Fix:** Add error recovery (e.g. `onErrorResume`) so that a transient InfluxDB failure is logged and skipped, matching the existing HTTP error handling pattern in `LAN2RFRepository`.
 
 ### 2. Use configured room names instead of hardcoded strings
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `StatusDataPublisher.kt:113,143`
 - **Problem:** `val room1 = "room1"` and `val room2 = "room2"` are hardcoded despite `LAN2RFConfiguration` already exposing `room1Name` and `room2Name` properties. The configured values are logged at startup but never used as InfluxDB tag values.
 - **Fix:** Replace the hardcoded strings with `lan2RFConfiguration.room1Name` and `lan2RFConfiguration.room2Name`.
