@@ -12,9 +12,8 @@ import com.influxdb.client.domain.WritePrecision
 import com.influxdb.client.kotlin.InfluxDBClientKotlin
 import io.micronaut.context.annotation.Requires
 import jakarta.inject.Singleton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactor.mono
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -31,26 +30,19 @@ class StatusDataPublisher(
     fun publishAsDiscreteMeasurements(statusData: Flux<StatusData>): Flux<Void> {
         return statusData
             .flatMap { statusData ->
-                Mono.create<Void> { sink ->
-                    val job = CoroutineScope(Dispatchers.IO).launch {
-                        try {
-                            val now = now()
-                            val measurements = asMeasurements(statusData, now)
-                            influxDBClientKotlin
-                                .getWriteKotlinApi()
-                                .writeMeasurements(
-                                    measurements,
-                                    WritePrecision.MS
-                                )
-                            LOGGER.info("Status Data measurements sent at: {}", now)
-                            LOGGER.debug("Measurements: {}", measurements)
-                            sink.success()
-                        } catch (e: Exception) {
-                            sink.error(e)
-                        }
-                    }
-                    sink.onDispose { job.cancel() }
+                mono(Dispatchers.IO) {
+                    val now = now()
+                    val measurements = asMeasurements(statusData, now)
+                    influxDBClientKotlin
+                        .getWriteKotlinApi()
+                        .writeMeasurements(
+                            measurements,
+                            WritePrecision.MS
+                        )
+                    LOGGER.info("Status Data measurements sent at: {}", now)
+                    LOGGER.debug("Measurements: {}", measurements)
                 }
+                .then(Mono.empty<Void>())
                 .onErrorResume { e ->
                     LOGGER.error("Failed to write measurements to InfluxDB. Will retry on next interval.", e)
                     Mono.empty()
