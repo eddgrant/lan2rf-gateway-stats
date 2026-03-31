@@ -1,0 +1,3 @@
+package com.eddgrant.lan2rfgatewaystats.persistence.influxdb
+
+sealed interface InfluxDBMeasurement

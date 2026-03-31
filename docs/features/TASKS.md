@@ -28,7 +28,7 @@
 - **Fix:** Add Micronaut's `management` dependency for a `/health` endpoint. Consider a custom health indicator that checks whether the `Disposable` is still active and whether the last successful write was within a reasonable window.
 
 ### 5. Introduce a sealed interface for measurement types
-- **Status:** TODO
+- **Status:** DONE
 - **File:** `StatusDataPublisher.kt:60`
 - **Problem:** `asMeasurements()` returns `Set<Any>` because the four measurement types (Temperature, Pressure, OperationalStatus, TextStatus) share no common type. The compiler can't prevent non-measurement objects from being added.
 - **Fix:** Create a `sealed interface Measurement` implemented by all four types. Return `Set<Measurement>` from `asMeasurements()`.

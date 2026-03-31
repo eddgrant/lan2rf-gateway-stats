@@ -11,7 +11,7 @@ data class Temperature(
     @Column val value: Double,
     @Column(tag = true) val type: Type,
     @Column(timestamp = true) val time: Instant,
-) {
+) : InfluxDBMeasurement {
     enum class Type {
         RECORDED,
         SETPOINT,

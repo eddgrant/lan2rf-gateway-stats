@@ -10,4 +10,4 @@ data class OperationalStatus(
     @Column(tag = true) val subject: String,
     @Column val active: Boolean,
     @Column(timestamp = true) val time: Instant,
-)
+) : InfluxDBMeasurement
