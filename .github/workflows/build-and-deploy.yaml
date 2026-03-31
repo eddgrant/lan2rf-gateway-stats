@@ -76,7 +76,7 @@ jobs:
 
       - name: Publish Unit Test Report
         if: success() || failure()
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         with:
           name: Unit Test Report
           path: build/test-results/test/*.xml
