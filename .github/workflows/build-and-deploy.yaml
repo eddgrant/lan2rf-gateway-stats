@@ -12,6 +12,10 @@ on:
         required: true
       docker_hub_password:
         required: true
+    outputs:
+      version:
+        description: The semantic version of the built Docker image
+        value: ${{ jobs.build.outputs.version }}
 
 concurrency:
   # Scoped per-workflow and ref. Version collision safety is handled by the caller
@@ -28,6 +32,8 @@ jobs:
   #  uses: ./.github/workflows/integration-tests.yaml
 
   build:
+    outputs:
+      version: ${{ steps.semver.outputs.version }}
     permissions:
       actions: read
       checks: write
