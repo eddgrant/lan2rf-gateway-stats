@@ -28,7 +28,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Comment Docker image details on PR
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           IMAGE_VERSION: ${{ needs.pr-build-and-release.outputs.version }}
         with:

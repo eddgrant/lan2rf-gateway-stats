@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Find merged PR
         id: find-pr
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -48,7 +48,7 @@ jobs:
 
       - name: Comment Docker image details on PR
         if: steps.find-pr.outputs.pr_number
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           IMAGE_VERSION: ${{ needs.main-build-and-release.outputs.version }}
           PR_NUMBER: ${{ steps.find-pr.outputs.pr_number }}
