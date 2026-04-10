@@ -113,6 +113,49 @@ docker run --rm \
     eddgrant/lan2rf-gateway-stats:local
 ```
 
+## Authentication
+
+By default, `lan2rf-gateway-stats` talks to the LAN2RF device anonymously. This matches the LAN2RF's default, where HTTP Basic Auth is disabled.
+
+If you have enabled Basic Auth on your LAN2RF device, set **both** of the following environment variables to provide credentials:
+
+- `LAN2RF_BASIC_AUTH_USERNAME`
+- `LAN2RF_BASIC_AUTH_PASSWORD`
+
+If only one is set, Basic Auth remains disabled. Example:
+
+```shell
+docker run --rm \
+  --net=lan2rf-gateway-stats \
+  --env LAN2RF_CHECK_INTERVAL=30s \
+  --env LAN2RF_URL="http://192.168.2.58" \
+  --env LAN2RF_BASIC_AUTH_USERNAME="my-lan2rf-user" \
+  --env LAN2RF_BASIC_AUTH_PASSWORD="my-lan2rf-password" \
+  --env INFLUXDB_ORG="my-influxdb-org" \
+  --env INFLUXDB_BUCKET="intergas" \
+  --env INFLUXDB_TOKEN="my-very-secure-influxdb-token" \
+  --env INFLUXDB_URL="http://influxdb:8086?connectTimeout=5S&readTimeout=5S&writeTimeout=5S" \
+    eddgrant/lan2rf-gateway-stats:local
+```
+
+You can verify the configuration by looking for the `basicAuthEnabled` field in the startup log line, e.g.
+
+```
+INFO  c.e.l.intergas.LAN2RFConfiguration - LAN2RF Configuration: source='lan2rf', ..., basicAuthEnabled='true'
+```
+
+If authentication fails (HTTP 401 or 403), the application logs an error message naming the two environment variables and will automatically retry on the next polling interval. The application does not crash on auth failure.
+
+### :warning: Security warning — Basic Auth over plaintext HTTP
+
+The LAN2RF does **not** support TLS, so all traffic between this application and the device — including HTTP Basic Auth credentials — travels over the network in plaintext. HTTP Basic Auth sends the `Authorization: Basic <base64(username:password)>` header on every request; **base64 is encoding, not encryption**. Anyone able to observe traffic on your LAN can trivially recover the credentials.
+
+If you enable Basic Auth on your LAN2RF:
+
+- Only use it on a trusted, well-segmented network.
+- Treat the credentials as low-value and **rotate them frequently**.
+- **Never reuse** the password for any other system or account.
+
 ## The Data
 
 The application publishes several types of measurements to InfluxDB, each representing a different aspect of the heating system's status.
