@@ -28,4 +28,40 @@ class LAN2RFConfigurationTest : StringSpec({
         lan2rfConfiguration.measurements.room1.shouldBe(true)
         lan2rfConfiguration.measurements.room2.shouldBe(true)
     }
+
+    "Basic auth is disabled by default" {
+        lan2rfConfiguration.basicAuth.username.shouldBe(null)
+        lan2rfConfiguration.basicAuth.password.shouldBe(null)
+        lan2rfConfiguration.isBasicAuthEnabled().shouldBe(false)
+    }
+
+    "Basic auth is disabled when only the username is set" {
+        val config = LAN2RFConfiguration().apply {
+            basicAuth.username = "admin"
+        }
+        config.isBasicAuthEnabled().shouldBe(false)
+    }
+
+    "Basic auth is disabled when only the password is set" {
+        val config = LAN2RFConfiguration().apply {
+            basicAuth.password = "s3cret"
+        }
+        config.isBasicAuthEnabled().shouldBe(false)
+    }
+
+    "Basic auth is disabled when username or password is blank" {
+        val config = LAN2RFConfiguration().apply {
+            basicAuth.username = "   "
+            basicAuth.password = "s3cret"
+        }
+        config.isBasicAuthEnabled().shouldBe(false)
+    }
+
+    "Basic auth is enabled when both username and password are set" {
+        val config = LAN2RFConfiguration().apply {
+            basicAuth.username = "admin"
+            basicAuth.password = "s3cret"
+        }
+        config.isBasicAuthEnabled().shouldBe(true)
+    }
 })

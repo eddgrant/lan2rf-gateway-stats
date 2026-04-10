@@ -1,11 +1,20 @@
 package com.eddgrant.lan2rfgatewaystats.intergas
 
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldHaveAtLeastSize
+import io.kotest.matchers.string.shouldContain
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.exceptions.HttpClientException
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import io.mockk.every
 import io.mockk.mockk
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.time.Duration
@@ -28,6 +37,43 @@ class LAN2RFRepositoryTest(
             .expectNext(StatusDataTestFixtures.BASIC)
             .thenCancel()
             .verify()
+    }
+
+    "it logs an authentication-failure message and continues polling on HTTP 401" {
+        // Given
+        val appender = ListAppender<ILoggingEvent>().apply { start() }
+        val repoLogger = LoggerFactory.getLogger(LAN2RFRepository::class.java) as Logger
+        repoLogger.addAppender(appender)
+
+        val unauthorized = HttpClientResponseException(
+            "Unauthorized",
+            HttpResponse.status<Any>(HttpStatus.UNAUTHORIZED)
+        )
+        every { intergasService.getStatusData() } returnsMany listOf(
+            Mono.error(unauthorized),
+            Mono.just(StatusDataTestFixtures.BASIC)
+        )
+
+        // When / Then
+        try {
+            StepVerifier.withVirtualTime { lan2rfRepository.getStatusData() }
+                .expectSubscription()
+                .thenAwait(lan2rfConfiguration.checkInterval)
+                .thenAwait(lan2rfConfiguration.checkInterval)
+                .expectNext(StatusDataTestFixtures.BASIC)
+                .thenCancel()
+                .verify()
+
+            appender.list.shouldHaveAtLeastSize(1)
+            val message = appender.list.first { it.level.levelStr == "ERROR" }.formattedMessage
+            message shouldContain "authentication failed"
+            message shouldContain "401"
+            message shouldContain "LAN2RF_BASIC_AUTH_USERNAME"
+            message shouldContain "LAN2RF_BASIC_AUTH_PASSWORD"
+        } finally {
+            repoLogger.detachAppender(appender)
+            appender.stop()
+        }
     }
 
     "it continues to poll for data when there is a connect exception" {
