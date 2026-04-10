@@ -24,6 +24,8 @@ class LAN2RFConfiguration {
 
     var measurements = Measurements()
 
+    var basicAuth = BasicAuth()
+
     @ConfigurationProperties("measurements")
     data class Measurements(
         var boiler: Boolean = true,
@@ -31,17 +33,27 @@ class LAN2RFConfiguration {
         var room2: Boolean = true
     )
 
+    @ConfigurationProperties("basic-auth")
+    class BasicAuth {
+        var username: String? = null
+        var password: String? = null
+    }
+
+    fun isBasicAuthEnabled(): Boolean =
+        !basicAuth.username.isNullOrBlank() && !basicAuth.password.isNullOrBlank()
+
     @PostConstruct
     fun logConfiguration() {
         LOGGER.info(
-            "LAN2RF Configuration: source='{}', room1Name='{}', room2Name='{}', checkInterval='{}', measurements.boiler='{}', measurements.room1='{}', measurements.room2='{}'",
+            "LAN2RF Configuration: source='{}', room1Name='{}', room2Name='{}', checkInterval='{}', measurements.boiler='{}', measurements.room1='{}', measurements.room2='{}', basicAuthEnabled='{}'",
             source,
             room1Name,
             room2Name,
             checkInterval,
             measurements.boiler,
             measurements.room1,
-            measurements.room2
+            measurements.room2,
+            isBasicAuthEnabled()
         )
     }
 
