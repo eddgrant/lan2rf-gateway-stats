@@ -5,7 +5,7 @@ import io.micronaut.gradle.docker.MicronautDockerfile
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.21"
     id("org.jetbrains.kotlin.plugin.allopen") version "2.3.21"
-    id("com.google.devtools.ksp") version "2.3.6"
+    id("com.google.devtools.ksp") version "2.3.7"
     id("com.gradleup.shadow") version "9.4.1"
     id("io.micronaut.application") version "4.6.2"
     id("io.micronaut.aot") version "4.6.2"
