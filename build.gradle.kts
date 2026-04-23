@@ -51,7 +51,7 @@ dependencies {
     implementation("io.micronaut.serde:micronaut-serde-jackson")
 
     implementation("io.micronaut:micronaut-management")
-    implementation("com.influxdb:influxdb-client-kotlin:7.5.0")
+    implementation("com.influxdb:influxdb-client-kotlin:8.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     testImplementation("org.testcontainers:influxdb:1.21.4")
