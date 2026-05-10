@@ -1,29 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "packageRules": [
-    {
-      "groupName": "Micronaut Platform",
-      "groupSlug": "micronaut-platform",
-      "matchPackageNames": [
-        "io.micronaut.platform.*"
-      ]
-    },
-    {
-      "groupName": "Micronaut",
-      "groupSlug": "micronaut",
-      "matchPackageNames": [
-        "io.micronaut.*"
-      ]
-    },
-    {
-      "groupName": "Jetbrains Kotlin",
-      "groupSlug": "jetbrains-platform",
-      "matchPackageNames": [
-        "org.jetbrains.kotlin.*"
-      ]
-    }
-  ]
+  "extends": ["github>eddgrant/renovate-config"]
 }
